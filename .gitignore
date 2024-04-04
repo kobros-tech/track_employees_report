@@ -1,0 +1,7 @@
+# ignore cached pytion and xml files
+
+*.pyc
+
+# ignore init and manifest cashed files
+
+

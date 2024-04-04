@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model='ir.ui.view' id='project_xls_report_view_form'>
+        <field name="name">employee.xls.report.view.form</field>
+        <field name="model">employee.xls.report</field>
+        <field name="arch" type="xml">
+            <form string="Wizard" js_class="PrintExcel">
+                <group>
+                    <group string="Project">
+                        <field name="project_ids" widget="many2many_tags"/>
+                    </group>
+                    <group string="Employee">
+                        <field name="user_ids" widget="many2many_tags"/>
+                    </group> 
+                </group>
+                <notebook>
+                    
+                    <page string="Project Members">
+                        <field name="user_ids" readonly="1">
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="test_export" type="object"
+                            string="Preview"
+                            class="oe_highlight"
+                            icon="fa-download"/>
+                    <widget name="print_excel_file"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record model='ir.actions.act_window' id='stock_xls_report_action'>
+        <!--Stock Report form view action-->
+        <field name="name">Export product stock in Excel</field>
+        <field name="res_model">employee.xls.report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="project_xls_report_view_form"/>
+        <field name="target">new</field>
+    </record>
+    
+    <menuitem name="Emloyees Report"
+              parent="project.menu_project_report"
+              id="export_excel"
+              action="stock_xls_report_action"
+              sequence="3"/>
+</odoo>
