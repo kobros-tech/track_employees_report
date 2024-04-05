@@ -6,25 +6,31 @@
         <field name="arch" type="xml">
             <form string="Wizard" js_class="PrintExcel">
                 <group>
+                    <field name="analytic_from"/>
+                    <field name="from_date"/>
+                    <field name="analytic_to"/>
+                    <field name="to_date"/>
+                </group>
+                <group>
                     <group string="Project">
                         <field name="project_ids" widget="many2many_tags"/>
                     </group>
                     <group string="Employee">
-                        <field name="user_ids" widget="many2many_tags"/>
+                        <field name="employee_ids" widget="many2many_tags"/>
                     </group> 
                 </group>
                 <notebook>
                     
-                    <page string="Project Members">
-                        <field name="user_ids" readonly="1">
+                    <page string="Selected Employees">
+                        <field name="target_users_ids" readonly="1">
                         </field>
                     </page>
                 </notebook>
                 <footer>
-                    <button name="test_export" type="object"
+                    <!-- <button name="test_export" type="object"
                             string="Preview"
                             class="oe_highlight"
-                            icon="fa-download"/>
+                            icon="fa-download"/> -->
                     <widget name="print_excel_file"/>
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
