@@ -5,11 +5,13 @@
         <field name="model">employee.xls.report</field>
         <field name="arch" type="xml">
             <form string="Wizard" js_class="PrintExcel">
-                <group>
-                    <field name="analytic_from"/>
-                    <field name="from_date"/>
-                    <field name="analytic_to"/>
-                    <field name="to_date"/>
+                <group string="Date Period">
+                    <group>
+                        <field name="from_date"/>
+                    </group>
+                    <group>
+                        <field name="to_date"/>
+                    </group>
                 </group>
                 <group>
                     <group string="Project">
@@ -22,15 +24,18 @@
                 <notebook>
                     
                     <page string="Selected Employees">
-                        <field name="target_users_ids" readonly="1">
+                        <field name="target_employees_ids" readonly="1">
+                            <tree>
+                                <field name="name"/>
+                            </tree>
                         </field>
                     </page>
                 </notebook>
                 <footer>
-                    <!-- <button name="test_export" type="object"
+                    <button name="get_target_employees_days" type="object"
                             string="Preview"
                             class="oe_highlight"
-                            icon="fa-download"/> -->
+                            icon="fa-download"/>
                     <widget name="print_excel_file"/>
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>

@@ -12,25 +12,25 @@ class PrintExcel extends Component {
     }
 
     async onDownloadButtonClicked() {
-        // console.log(this.env.model.root);
-        // console.log(this.env.model.root.data);
         // console.log(this.env.model.root.data.project_ids.records);
 
         const projects = this.env.model.root.data.project_ids.records
-        const users = this.env.model.root.data.user_ids.records
+        const employees = this.env.model.root.data.target_employees_ids.records
         
         const projects_ids = projects.map((project) =>{
             return project.data;
         })
-        const user_ids = projects.map((users) =>{
-            return users.data;
+        const target_employees_ids = employees.map((employees) =>{
+            return employees.data;
         })
 
-        const data = { "project.project": projects_ids, "res.users": user_ids};
+        const data = { "project.project": projects_ids, "hr.employee": target_employees_ids};
 
-        // console.log("Projects:", projects);
-        // console.log("projects_ids:", projects_ids);
-        // console.log("downloading excel file");
+        console.log("Projects:", projects);
+        console.log("employees:", employees);
+        console.log("target_employees_ids:", target_employees_ids);
+        console.log("projects_ids:", projects_ids);
+        console.log("downloading excel file");
 
         download({
             url: '/xlsx_reports_2',
