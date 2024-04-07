@@ -29,7 +29,9 @@
     'company': 'kobros-tech',
     'maintainer': 'Mohamed Alkobrosli',
     'depends': [
-        'project',
+        'project', 
+        'timesheet_grid', 
+        'hr_holidays',
     ],
     'website': 'http://www.kobros-tech.com',
     'data': [

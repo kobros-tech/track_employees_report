@@ -24,6 +24,7 @@ class XLSXReportController(http.Controller):
     """Controller to generate and print XLS reports."""
 
     def get_timeoff_days(self, employee, to_date, from_date):
+        
         # mehtod will get three arguments [employee, from_date, to_date]
         print("Time Off for employee: ", employee.name)
 
@@ -80,6 +81,7 @@ class XLSXReportController(http.Controller):
                     print("_____________________________________________")
         
             step_date = fields.Date.add(from_date, days=i+1)
+
     
 
     def get_xlsx_report(self, data, response):
