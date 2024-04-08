@@ -89,40 +89,46 @@ class EmloyeeReport(models.TransientModel):
                 rec.target_employees_ids = rec.employee_ids
 
     
+
+    def default_starting_and_end_dates(self, time_off_recs_all):
+        all_from_dates = time_off_recs_all.mapped(lambda timeoff: fields.Date.to_date(timeoff.date_from))
+        from_date = sorted(all_from_dates)[0]
+        all_to_dates = time_off_recs_all.mapped(lambda timeoff: fields.Date.to_date(timeoff.date_to))
+        to_date = sorted(all_to_dates)[-1]
+
+        return from_date, to_date
+
+
     def get_target_employees_days(self):
         self.ensure_one()
         employee = self.env["hr.employee"].browse([1])
         from_date = self.from_date
         to_date = self.to_date
 
-        
-        # mehtod will get three arguments [employee, from_date, to_date]
+        """
+            Mehtod will get three arguments [employee, from_date, to_date]
+        """
         print("Time Off for employee: ", employee.name)
 
+        # ------------------------------------------- Defaults -------------------------------------------
         time_off_recs_all = self.env["hr.leave"].search([]).filtered(lambda timeoff: 
             employee in timeoff.all_employee_ids
         )
         
-        print(employee)
-        print(time_off_recs_all)
-        print("Time Off Number:", len(time_off_recs_all))
 
         # List of all employee time off days 
         time_off_list = []
 
         # public hoidays to check within before returning time off days
         publick_holidays = self.env["resource.calendar.leaves"].search([("name", "ilike", "Public Time Off")])
+        # ------------------------------------------------------------------------------------------------
 
         # do search if there is any time off records
         if len(time_off_recs_all) > 0:
 
             # set default starting date and end date
             if (not from_date) or (not to_date):
-
-                all_from_dates = time_off_recs_all.mapped(lambda timeoff: fields.Date.to_date(timeoff.date_from))
-                from_date = sorted(all_from_dates)[0]
-                all_to_dates = time_off_recs_all.mapped(lambda timeoff: fields.Date.to_date(timeoff.date_to))
-                to_date = sorted(all_to_dates)[-1]
+                from_date, to_date = self.default_starting_and_end_dates(time_off_recs_all)
 
                 print(from_date.strftime('%d-%m-%Y'))
                 print(to_date.strftime('%d-%m-%Y'))
@@ -131,6 +137,7 @@ class EmloyeeReport(models.TransientModel):
             number_of_days = (to_date - from_date).days
             step_date = from_date
 
+            # loop through all step days
             for i in range(number_of_days + 1):
 
                 filtered_time_off = time_off_recs_all.filtered(
@@ -149,87 +156,107 @@ class EmloyeeReport(models.TransientModel):
                 )
 
                 print("Step Day:", step_date)
-                print("Public Holidays:", publick_holidays)
+                print("Day of the Week:", step_date.isoweekday())
+                
 
                 publick_holiday = publick_holidays.filtered(
                     lambda rec: 
                         fields.Date.to_date(rec.date_from) == step_date
                 )
-                
-                for day in publick_holidays:
-                    print("=================================")
-                    print("Public Holiday:", day.name)
-                    print("Public Holiday From:", day.date_from)
-                    print("Public Holiday To:", day.date_to)
-                    print("=================================")
-                
-                print(publick_holiday)
 
-                # Check if each step day is a public holiday or another holiday
+                time_off = filtered_time_off.filtered(
+                    lambda rec:
+                        step_date >= fields.Date.to_date(rec.date_from) and step_date <= fields.Date.to_date(rec.date_to)
+                )
+                
+                # =============================================================
+                print("First Condition: =====>", len(publick_holiday), publick_holiday)
+                print("Second Condition : ======>", len(time_off), time_off)
+                # =============================================================
+
+                # Check if each step day is a public holiday or another holiday or a working day or a weekend
                 if len(publick_holiday) > 0:
                     holiday = publick_holiday[:1]
                     time_off_list.append(
-                        {
-                            "time_off": "H",
-                            "from": holiday.date_from,
-                            "to": holiday.date_to,
-                            "project": holiday.holiday_id.holiday_status_id.timesheet_project_id,
-                            "state": holiday.holiday_id.state,
-                        }
+                        [
+                            {
+                                "step_date": step_date
+                            },
+
+                            {
+                                "time_off": "H",
+                                "from": holiday.date_from,
+                                "to": holiday.date_to,
+                                "project": holiday.holiday_id.holiday_status_id.timesheet_project_id,
+                                "state": holiday.holiday_id.state,
+                            }
+                        ]
                     )
-                    print("Time Off: ==>", "H")
+                # check if the step day is within the time off
+                elif len(time_off) > 0:
+                    time_off_date_from = fields.Date.to_date(time_off.date_from)
+                    time_off_date_to = fields.Date.to_date(time_off.date_to)
+                    time_off_name = time_off.holiday_status_id.display_name
+                    time_off_project = time_off.holiday_status_id.timesheet_project_id
+                    
+                    # default value prefix for time off display name
+                    prefix = ""
+                        
+                    if "Sick" in time_off_name:
+                        prefix = "S"
+                    elif "Compensatory" in time_off_name or "Paid" in time_off_name or "Unpaid" in time_off_name:
+                        prefix = "V"
+
+                    time_off_list.append(
+                        [
+                            {
+                                "step_date": step_date
+                            },
+
+                            {
+                                "time_off": prefix,
+                                "from": time_off_date_from,
+                                "to": time_off_date_to,
+                                "project": time_off_project,
+                                "state": time_off.state,
+                            }
+                        ]
+                    )   
+                # step day could be a weekend [friday or saturday]
+                elif step_date.isoweekday() in [5, 6]:
+                    print("Weekend!")
+                    time_off_list.append(
+                        [
+                            {
+                                "step_date": step_date
+                            },
+
+                            {
+                                "time_off": "",
+                            }
+                        ]
+                    )
+                # step day should be a working day
                 else:
-                    for time_off in filtered_time_off:
-                        time_off_date_from = fields.Date.to_date(time_off.date_from)
-                        time_off_date_to = fields.Date.to_date(time_off.date_to)
-                        time_off_name = time_off.holiday_status_id.display_name
-                        time_off_project = time_off.holiday_status_id.timesheet_project_id
-                        
-                        # default value prefix for time off display name
-                        prefix = ""
-                        
-                        # check if the step day is a working day or a time off
-                        if time_off_date_from == step_date or time_off_date_to == step_date:
-                            
-                            if "Sick" in time_off_name:
-                                prefix = "S"
-                            elif "Compensatory" in time_off_name or "Paid" in time_off_name or "Unpaid" in time_off_name:
-                                prefix = "V"
+                    print("Working Day!")
+                    time_off_list.append(
+                        [
+                            {
+                                "step_date": step_date
+                            },
 
-                            time_off_list.append(
-                                {
-                                    "time_off": prefix,
-                                    "from": time_off_date_from,
-                                    "to": time_off_date_to,
-                                    "project": time_off_project,
-                                    "state": time_off.state,
-                                }
-                            )
-
-                            print("______________ time off result ______________")
-                            print("Time Off: ==>", prefix)
-                            print("From: ==>", time_off_date_from)
-                            print("To: ==>", time_off_date_to)
-                            print("Project: ==>", time_off_project.name)
-                            print("Status: ==>", time_off.state)
-                            print("_____________________________________________")
-                        else:
-                            prefix = "P"
-                            time_off_list.append(
-                                {
-                                    "time_off": prefix,
-                                }
-                            )
-
-                            print("______________ time off result ______________")
-                            print("Working Day!")
-                            print("_____________________________________________")
-                        
-                        # end of timeoff loop
+                            {
+                                "time_off": "P",
+                            }
+                        ]
+                    )
                 
                 # end of looping over the specified number of days
                 step_date = fields.Date.add(from_date, days=i+1)
-        
-        print(time_off_list)
+            
+            # end of step days loop
+
+        for item in time_off_list:
+            print(item)
                 
     
