@@ -17,6 +17,9 @@ class PrintExcel extends Component {
 
         const projects = this.env.model.root.data.project_ids.records
         const employees = this.env.model.root.data.target_employees_ids.records
+        const from_date = this.env.model.root.data.from_date.c
+        const to_date = this.env.model.root.data.to_date.c
+        const validate = this.env.model.root.data.validate
         
         const projects_ids = projects.map((project) =>{
             return project.data;
@@ -25,8 +28,16 @@ class PrintExcel extends Component {
             return employee.data;
         })
 
-        const data = { "project.project": projects_ids, "hr.employee": target_employees_ids};
+        const data = { 
+            "project.project": projects_ids, 
+            "hr.employee": target_employees_ids,
+            from_date: from_date,
+            to_date: to_date,
+            validate: validate,
+        };
 
+        console.log(data);
+        console.log("times", from_date, to_date);
         console.log("Projects:", projects);
         console.log("employees:", employees);
         console.log("target_employees_ids:", target_employees_ids);

@@ -5,6 +5,9 @@
         <field name="model">employee.xls.report</field>
         <field name="arch" type="xml">
             <form string="Wizard" js_class="PrintExcel">
+                <group>
+                    <field name="validate" string="Validated or Drafted" placeholder="Choose Status"/>
+                </group>
                 <group string="Date Period">
                     <group>
                         <field name="from_date"/>
@@ -33,19 +36,21 @@
                     </page>
                 </notebook>
                 <footer>
-                    <button name="get_target_employees_days" type="object"
+                    <!-- <button name="" type="object"
                             string="Preview"
                             class="oe_highlight"
-                            icon="fa-download"/>
-                    <widget name="custom_print_excel_file"/>
+                            icon="fa-download"/> -->
+                    <widget name="custom_print_excel_file" 
+                        invisible="not from_date or not to_date or not validate"
+                        />
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
+
     <record model='ir.actions.act_window' id='stock_xls_report_action'>
-        <!--Stock Report form view action-->
-        <field name="name">Export product stock in Excel</field>
+        <field name="name">Employee Time Sheet</field>
         <field name="res_model">employee.xls.report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">form</field>
@@ -54,8 +59,8 @@
     </record>
     
     <menuitem name="Emloyees Report"
-              parent="project.menu_project_report"
-              id="export_excel"
-              action="stock_xls_report_action"
-              sequence="3"/>
+        parent="hr_timesheet.menu_timesheets_reports"
+        id="export_excel"
+        action="stock_xls_report_action"
+        sequence="3"/>
 </odoo>

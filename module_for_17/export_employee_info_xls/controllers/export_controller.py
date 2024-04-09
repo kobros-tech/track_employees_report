@@ -23,176 +23,208 @@ except ImportError:
 class XLSXReportController(http.Controller):
     """Controller to generate and print XLS reports."""
 
-    def default_starting_and_end_dates(self):
-        time_off_recs_all = request.env["hr.leave"].search([])
-        all_from_dates = time_off_recs_all.mapped(lambda timeoff: fields.Date.to_date(timeoff.date_from))
-        from_date = sorted(all_from_dates)[0]
-        all_to_dates = time_off_recs_all.mapped(lambda timeoff: fields.Date.to_date(timeoff.date_to))
-        to_date = sorted(all_to_dates)[-1]
+    def get_account_analytic_line(self, employee, validate):
+        # Main condition, analytic line for the employee
+        
+        analytic_line = request.env['account.analytic.line'].search([("employee_id", "=", employee.id)])
+        
+        if validate == "validate":
+            result = analytic_line.filtered(
+                lambda line:
+                    line.validated == True
+            )
+            return result
+        elif validate == "draft":
+            result = analytic_line.filtered(
+                lambda line:
+                    line.validated == False
+            )
+            return result
+        else:
+            return analytic_line
 
-        return from_date, to_date
+    
+    def get_filtered_timeoff(self, employee, from_date, to_date):
+        filtered_time_off = request.env["hr.leave"].search([]).filtered(
+            lambda timeoff: 
+                # holiday date must be on or AFTER the selected period beginning
+                fields.Date.to_date(timeoff.date_from) >= from_date
+            and
+                # holiday date must be on or BEFORE the selected period end
+                fields.Date.to_date(timeoff.date_from) <= to_date
+            and
+                # employee must have rcorded his own holiday
+                employee in timeoff.all_employee_ids
+            and
+                # display only the validated time off
+                timeoff.state == "validate" 
+        )
+
+        return filtered_time_off
 
 
-    def get_target_employees_days(self, employee, from_date=None, to_date=None):
+    def check_public_holiday(self, public_holidays, step_date):
+        publick_holiday = public_holidays.filtered(
+            lambda rec: 
+                step_date >= fields.Date.to_date(rec.date_from) 
+                and 
+                step_date <= fields.Date.to_date(rec.date_to)
+        )
+
+        if len(publick_holiday) > 0:
+            return True
+        else:
+            return False
+
+
+    def check_time_off(self, filtered_time_off, step_date):
+        time_off = filtered_time_off.filtered(
+            lambda rec:
+                step_date >= fields.Date.to_date(rec.date_from) 
+                and 
+                step_date <= fields.Date.to_date(rec.date_to)
+        )
+
+        if len(time_off) > 0:
+            time_off = time_off[:1]
+            time_off_name = time_off.holiday_status_id.display_name
+            
+            # default value prefix for time off display name
+            prefix = ""
+                
+            if "Sick" in time_off_name:
+                prefix = "S"
+            elif "Compensatory" in time_off_name or "Paid" in time_off_name or "Unpaid" in time_off_name:
+                prefix = "V"
+            
+            return True, prefix
+        else:
+            return False, False
+
+
+    def check_work_day(self, employee, analytic_line, step_date):
+        lines = analytic_line.search([("date", "=", step_date)])
+        prefix = False
+
+        for line in lines:
+            if (not line.global_leave_id) and (not line.holiday_id) and line.unit_amount > 0.0:
+                
+                day_num = step_date.isoweekday()
+                
+                if day_num == 1 and employee.work_from_home_monday:
+                    prefix = "W"
+                elif day_num == 2 and employee.work_from_home_tuesday:
+                    prefix = "W"
+                elif day_num == 3 and employee.work_from_home_wednesday:
+                    prefix = "W"
+                elif day_num == 4 and employee.work_from_home_thursday:
+                    prefix = "W"
+                elif day_num == 5 and employee.work_from_home_friday:
+                    prefix = "W"
+                elif day_num == 6 and employee.work_from_home_saturday:
+                    prefix = "W"
+                elif day_num == 7 and employee.work_from_home_sunday:
+                    prefix = "W"
+                else:
+                    prefix = "P"
+            
+        
+        if prefix != False:
+            return True, prefix
+        else:
+            return False, False
+
+    
+    def append_day(self, time_off_list, step_date, letter):
+        print("time_off_list 2", time_off_list)
+        time_off_list.append(
+            [
+                {
+                    "step_date": step_date,
+                },
+
+                {
+                    "time_off": letter,
+                }
+            ]
+        )
+
+        return time_off_list
+
+
+
+    def get_target_employees_days(self, employee, from_date, to_date, validate):
 
         """
             Mehtod will get three arguments [employee, from_date, to_date]
         """
-        # print("Time Off for employee: ", employee.name)
+        print("Time Off for employee: ", employee.name)
 
         # ------------------------------------------- Defaults -------------------------------------------
-        time_off_recs_all = request.env["hr.leave"].search([]).filtered(lambda timeoff: 
-            employee in timeoff.all_employee_ids
-        )
+        # ------------------------------------------------------------------------------------------------
+
+        # time range for which days number is added in the excel sheet
+        number_of_days = (to_date - from_date).days
+        step_date = from_date
+
+        filtered_time_off = self.get_filtered_timeoff(employee, from_date, to_date)
         
+        # Main condition, analytic line for the employee
+        analytic_line = self.get_account_analytic_line(employee, validate)
+
+        print("Analytic Line is:", analytic_line)
+        for line in analytic_line:
+            print(line.display_name)
+            print(line.name)
+            print(line.global_leave_id.name)
+            print(line.holiday_id.name)
+            print(line.unit_amount)
+            print(line.validated_status)
+            print(line.validated)
+
+        # public hoidays to check within before returning time off days
+        public_holidays = request.env["resource.calendar.leaves"].search([]).filtered(
+            lambda leave:
+                (not leave.holiday_id.id) and (not leave.resource_id.id)
+        )
 
         # List of all employee time off days 
         time_off_list = []
-
-        # public hoidays to check within before returning time off days
-        publick_holidays = request.env["resource.calendar.leaves"].search([("name", "ilike", "Public Time Off")])
+        
+        # ------------------------------------------------------------------------------------------------
         # ------------------------------------------------------------------------------------------------
 
-        # do search if there is any time off records
-        if len(time_off_recs_all) > 0:
+        for i in range(number_of_days + 1):
+            if step_date in analytic_line.mapped("date"):
+                print("^^^^^^^^^^^^")
+                print("I am recorded")
+                print(analytic_line.search([("date", "=", step_date)]))
+                print("^^^^^^^^^^^^")
 
-            # set default starting date and end date
-            if (not from_date) or (not to_date):
-                from_date, to_date = self.default_starting_and_end_dates()
+                public_holiday_result = self.check_public_holiday(public_holidays, step_date)
+                timeoff_result, timeoff_prefix = self.check_time_off(filtered_time_off, step_date)
+                work_day_result, work_day_prefix = self.check_work_day(employee, analytic_line, step_date)
 
-                # print(from_date.strftime('%d-%m-%Y'))
-                # print(to_date.strftime('%d-%m-%Y'))
-
-
-            number_of_days = (to_date - from_date).days
-            step_date = from_date
-
-            # loop through all step days
-            for i in range(number_of_days + 1):
-
-                filtered_time_off = time_off_recs_all.filtered(
-                    lambda timeoff: 
-                        # holiday date must be on or AFTER the selected period beginning
-                        fields.Date.to_date(timeoff.date_from) >= from_date
-                    and
-                        # holiday date must be on or BEFORE the selected period end
-                        fields.Date.to_date(timeoff.date_from) <= to_date
-                    and
-                        # employee must have rcorded his own holiday
-                        timeoff.all_employee_ids in employee
-                    and
-                        # display only the validated time off
-                        timeoff.state == "validate" 
-                )
-
-                # print("Step Day:", step_date)
-                # print("Day of the Week:", step_date.isoweekday())
-                
-
-                publick_holiday = publick_holidays.filtered(
-                    lambda rec: 
-                        fields.Date.to_date(rec.date_from) == step_date
-                )
-
-                time_off = filtered_time_off.filtered(
-                    lambda rec:
-                        step_date >= fields.Date.to_date(rec.date_from) and step_date <= fields.Date.to_date(rec.date_to)
-                )
-                
-                # =============================================================
-                # print("First Condition: =====>", len(publick_holiday), publick_holiday)
-                # print("Second Condition : ======>", len(time_off), time_off)
-                # =============================================================
-
-                # Check if each step day is a public holiday or another holiday or a working day or a weekend
-                if len(publick_holiday) > 0:
-                    holiday = publick_holiday[:1]
-                    time_off_list.append(
-                        [
-                            {
-                                "step_date": step_date,
-                                "number_of_days": number_of_days + 1,
-                            },
-
-                            {
-                                "time_off": "H",
-                                "from": holiday.date_from,
-                                "to": holiday.date_to,
-                                "project": holiday.holiday_id.holiday_status_id.timesheet_project_id,
-                                "state": holiday.holiday_id.state,
-                            }
-                        ]
-                    )
-                # check if the step day is within the time off
-                elif len(time_off) > 0:
-                    time_off_date_from = fields.Date.to_date(time_off.date_from)
-                    time_off_date_to = fields.Date.to_date(time_off.date_to)
-                    time_off_name = time_off.holiday_status_id.display_name
-                    time_off_project = time_off.holiday_status_id.timesheet_project_id
-                    
-                    # default value prefix for time off display name
-                    prefix = ""
-                        
-                    if "Sick" in time_off_name:
-                        prefix = "S"
-                    elif "Compensatory" in time_off_name or "Paid" in time_off_name or "Unpaid" in time_off_name:
-                        prefix = "V"
-
-                    time_off_list.append(
-                        [
-                            {
-                                "step_date": step_date,
-                                "number_of_days": number_of_days + 1,
-                            },
-
-                            {
-                                "time_off": prefix,
-                                "from": time_off_date_from,
-                                "to": time_off_date_to,
-                                "project": time_off_project,
-                                "state": time_off.state,
-                            }
-                        ]
-                    )   
-                # step day could be a weekend [friday or saturday]
+                if public_holiday_result:
+                    time_off_list = self.append_day(time_off_list, step_date, "H")
+                elif timeoff_result:
+                    time_off_list = self.append_day(time_off_list, step_date, timeoff_prefix)
                 elif step_date.isoweekday() in [5, 6]:
-                    # print("Weekend!")
-                    time_off_list.append(
-                        [
-                            {
-                                "step_date": step_date,
-                                "number_of_days": number_of_days + 1,
-                            },
-
-                            {
-                                "time_off": "",
-                            }
-                        ]
-                    )
-                # step day should be a working day
+                    time_off_list = self.append_day(time_off_list, step_date, "")
+                elif work_day_result:
+                    time_off_list = self.append_day(time_off_list, step_date, work_day_prefix)
                 else:
-                    # print("Working Day!")
-                    time_off_list.append(
-                        [
-                            {
-                                "step_date": step_date,
-                                "number_of_days": number_of_days + 1,
-                            },
+                    time_off_list = self.append_day(time_off_list, step_date, "")
+            else:
+                time_off_list = self.append_day(time_off_list, step_date, "")
 
-                            {
-                                "time_off": "P",
-                            }
-                        ]
-                    )
-                
-                # end of looping over the specified number of days
-                step_date = fields.Date.add(from_date, days=i+1)
             
-            # end of step days loop
+            # append day before starting a new loop
+            step_date = fields.Date.add(from_date, days=i+1)
 
-        # for item in time_off_list:
-            # print(item)
-        
+        for item in time_off_list:
+            print(item)
+
         return time_off_list
 
 
@@ -200,14 +232,28 @@ class XLSXReportController(http.Controller):
 
     def get_xlsx_report(self, data, response):
         # initializing
+        from_date = datetime.date(
+            data['from_date']['year'], 
+            data['from_date']['month'], 
+            data['from_date']['day'])
+        
+        to_date = datetime.date(
+            data['to_date']['year'], 
+            data['to_date']['month'], 
+            data['to_date']['day'])
+        
+        validate = data['validate']
+        
+        number_of_days = (to_date - from_date).days + 1
+
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet('Project Info')
         
         # styleing
         heading_format = workbook.add_format({'bold': True, 'bg_color': '#714693', 'font_color': 'white' })
-        v_format = workbook.add_format({'bold': True, 'bg_color': '#40A860', 'font_color': 'white' })
-        h_format = workbook.add_format({'bold': True, 'bg_color': '#FCD917', 'font_color': 'black' })
+        v_format = workbook.add_format({'bold': True, 'bg_color': '#70AD47', 'font_color': 'white' })
+        h_format = workbook.add_format({'bold': True, 'bg_color': '#FFFF00', 'font_color': 'black' })
         s_format = workbook.add_format({'bold': True, 'bg_color': 'red', 'font_color': 'white' })
 
         # writing data
@@ -232,19 +278,23 @@ class XLSXReportController(http.Controller):
             # 1 cell
             emp_obj = request.env["hr.employee"].browse([emp_dict['id']])
             # 2 cell
-            worksheet.write(row, col+1, "Employee Vendor ID")
+            if emp_obj.vendor_id:
+                worksheet.write(row, col+1, emp_obj.vendor_id)
             # 3 cell
             if emp_obj.work_email:
                 worksheet.write(row, col+2, emp_obj.work_email)
             # 4 cell
-            worksheet.write(row, col+3, "Start Date")
+            if emp_obj.joining_date:
+                worksheet.write(row, col+3, emp_obj.joining_date)
             # 5 cell
             if emp_obj.gender:
                 worksheet.write(row, col+4, emp_obj.gender)
             # 6 cell
-            worksheet.write(row, col+5, "Section Manager")
+            if emp_obj.section_manager:
+                worksheet.write(row, col+5, emp_obj.section_manager)
             # 7 cell
-            worksheet.write(row, col+6, "Director/GM")
+            if emp_obj.director:
+                worksheet.write(row, col+6, emp_obj.director)
             # 8 cell
             if emp_obj.address_id:
                 worksheet.write(row, col+7, emp_obj.address_id.name)
@@ -252,15 +302,11 @@ class XLSXReportController(http.Controller):
             if emp_obj.job_id:
                 worksheet.write(row, col+8, emp_obj.job_id.name)
             # 10 cell
-            worksheet.write(row, col+9, "PO")
-            
-            # start looping over all available days
-            timeoff_result = self.get_target_employees_days(emp_obj)
+            if emp_obj.project_id.po:
+                worksheet.write(row, col+9, emp_obj.project_id.po)
+
+            timeoff_result = self.get_target_employees_days(emp_obj, from_date, to_date, validate)
             appended_cols = len(timeoff_result)
-            number_of_days = 0
-            
-            if appended_cols > 0:
-                number_of_days = timeoff_result[0][0]['number_of_days']
             
             for i in range(appended_cols):
                 step_day = timeoff_result[i][0]['step_date'].strftime('%d')
@@ -278,8 +324,12 @@ class XLSXReportController(http.Controller):
             
             # before last cell
             worksheet.write(0, col+9+number_of_days+1, "Location", heading_format)
+            if emp_obj.location:
+                worksheet.write(row, col+9+number_of_days+1, emp_obj.location)
             # last cell
             worksheet.write(0, col+9+number_of_days+2, "Nationality", heading_format)
+            if emp_obj.country_id:
+                worksheet.write(row, col+9+number_of_days+2, emp_obj.country_id.name)
 
             row += 1
 
@@ -297,6 +347,7 @@ class XLSXReportController(http.Controller):
         data = json.loads(data)
         print(data)
         print(type(data))
+
         print("===========================================")
         
         try:

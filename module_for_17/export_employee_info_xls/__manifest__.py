@@ -32,11 +32,15 @@
         'project', 
         'hr_holidays',
         'hr',
+        'hr_homeworking',
     ],
     'website': 'http://www.kobros-tech.com',
     'data': [
         'security/ir.model.access.csv',
         'wizard/select_data_wizard_view.xml',
+        'views/hr_work_location.xml',
+        'views/hr_employee.xml',
+        'views/project_project.xml'
     ],
     'assets': {
         'web.assets_backend': [

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id='view_employee_form_custom' model='ir.ui.view'>
+        <field name="name">view.employee.form.inherit.hr.custom</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr_homeworking.view_employee_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//group[@name='managers']" position="after">
+                <group string="HR and Managing">
+                    <field name="joining_date"/>
+                    <field name="section_manager"/>
+                    <field name="director"/>
+                    <field name="vendor_id" string="Vendor ID"/>
+                    <field name="project_id"/>
+                    <field name="location"/>
+                </group>
+            </xpath>
+
+            <!-- work from home section customizing -->
+            <xpath expr="//field[@name='monday_location_id']" position="replace">
+                <field name="monday_location_id" placeholder="Unspecified For Monday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_monday" string="From Home" invisible="not work_from_home_monday"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='tuesday_location_id']" position="replace">
+                <field name="tuesday_location_id" placeholder="Unspecified For Tuesday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_tuesday" string="From Home" invisible="not work_from_home_tuesday"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='wednesday_location_id']" position="replace">
+                <field name="wednesday_location_id" placeholder="Unspecified For Wednesday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_wednesday" string="From Home" invisible="not work_from_home_wednesday"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='thursday_location_id']" position="replace">
+                <field name="thursday_location_id" placeholder="Unspecified For Thursday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_thursday" string="From Home" invisible="not work_from_home_thursday"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='friday_location_id']" position="replace">
+                <field name="friday_location_id" placeholder="Unspecified For Friday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_friday" string="From Home" invisible="not work_from_home_friday"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='saturday_location_id']" position="replace">
+                <field name="saturday_location_id" placeholder="Unspecified For Saturday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_saturday" string="From Home" invisible="not work_from_home_saturday"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='sunday_location_id']" position="replace">
+                <field name="sunday_location_id" placeholder="Unspecified For Sunday" force_save="1"/>
+                <group>
+                    <field name="work_from_home_sunday" string="From Home" invisible="not work_from_home_sunday"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
