@@ -230,7 +230,7 @@ class XLSXReportController(http.Controller):
 
     
 
-    def get_xlsx_report(self, data, response):
+    def get_xlsx_report(self, data):
         # initializing
         from_date = datetime.date(
             data['from_date']['year'], 
@@ -334,42 +334,23 @@ class XLSXReportController(http.Controller):
             row += 1
 
         workbook.close()
-        output.seek(0)
-        response.stream.write(output.read())
-        output.close()
+        xlsx_data = output.getvalue()
+        return xlsx_data
 
 
-    @http.route('/xlsx_reports_2', type='http', auth='user', methods=['POST'])
-    def get_report_xlsx_2(self, data):
-        print("===========================================")
+    @http.route('/employee_xlsx_report', type='http', auth='user')
+    def get_employee_xlsx_report(self, data, **kw):
         report_obj = request.env["employee.xls.report"]
-
         data = json.loads(data)
-        print(data)
-        print(type(data))
+        filename = "employee_timesheet_report"
+        xlsx_data = self.get_xlsx_report(data)
+        response = request.make_response(
+            xlsx_data,
+            headers=[
+                ('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                ('Content-Disposition', content_disposition(filename + '.xlsx'))
+            ],
+        )
 
-        print("===========================================")
-        
-        try:
-            if 1 == 1:
-                response = request.make_response(
-                    None,
-                    headers=[
-                        ('Content-Type', 'application/vnd.ms-excel'),
-                        ('Content-Disposition',
-                         content_disposition("emplutee_report" + '.xlsx'))
-                    ]
-                )
-                self.get_xlsx_report(data, response)
-            # response.set_cookie('fileToken', token)
-            return response
-        except Exception as e:
-            se = _serialize_exception(e)
-            error = {
-                'code': 200,
-                'message': 'Odoo Server Error',
-                'data': se
-            }
-            return request.make_response(html_escape(json.dumps(error)))
-
+        return response
 

@@ -45,7 +45,7 @@ class PrintExcel extends Component {
         console.log("downloading excel file");
 
         download({
-            url: '/xlsx_reports_2',
+            url: '/employee_xlsx_report',
             data: { data: JSON.stringify(data) },
             error: (error) => self.call('crash_manager', 'rpc_error', error),
         });

@@ -22,8 +22,8 @@
 {
     'name': 'Export Project info in Excel',
     'version': '17.0.1.0.0',
-    'summary': 'Advanced PDF & XLS reports for Project info.',
-    'description': 'Advanced PDF & XLS reports for Project info by',
+    'summary': 'Advanced PDF & XLS reports for employees timesheet info.',
+    'description': 'Advanced PDF & XLS reports for employees timesheet info',
     'category': 'Project',
     'author': 'Mohamed Alkobrosli',
     'company': 'kobros-tech',
