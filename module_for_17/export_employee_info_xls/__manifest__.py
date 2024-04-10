@@ -20,8 +20,8 @@
 #
 ###############################################################################
 {
-    'name': 'Export Project info in Excel',
-    'version': '17.0.1.0.0',
+    'name': 'Export Employee info in Excel',
+    'version': '17.0.0.0.0',
     'summary': 'Advanced PDF & XLS reports for employees timesheet info.',
     'description': 'Advanced PDF & XLS reports for employees timesheet info',
     'category': 'Project',
