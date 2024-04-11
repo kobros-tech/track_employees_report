@@ -40,9 +40,7 @@
                             string="Preview"
                             class="oe_highlight"
                             icon="fa-download"/> -->
-                    <widget name="custom_print_excel_file" 
-                        invisible="not from_date or not to_date or not validate"
-                        />
+                    <widget name="custom_print_excel_file"/>
                     <button string="Cancel" class="oe_link" special="cancel"/>
                 </footer>
             </form>
