@@ -24,8 +24,15 @@
                         <field name="employee_ids" widget="many2many_tags"/>
                     </group> 
                 </group>
+
+                <field name="target_employees_ids" readonly="1" invisible="1">
+                    <tree>
+                        <field name="id"/>
+                        <field name="name"/>
+                    </tree>
+                </field>
                 
-                <notebook>
+                <!-- <notebook>
                     <page>
                         <field name="target_employees_ids" readonly="1" invisible="1">
                             <tree>
@@ -34,7 +41,7 @@
                             </tree>
                         </field>
                     </page>
-                </notebook>
+                </notebook> -->
 
                 <footer>
                     <!-- <button name="" type="object"
