@@ -44,7 +44,7 @@ class PrintExcel extends Component {
             to_date: to_date,
             validate: validate,
         };
-
+        
         download({
             url: '/employee_xlsx_report',
             data: { data: JSON.stringify(data) },

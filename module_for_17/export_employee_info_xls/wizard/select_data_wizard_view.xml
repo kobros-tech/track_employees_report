@@ -24,17 +24,18 @@
                         <field name="employee_ids" widget="many2many_tags"/>
                     </group> 
                 </group>
+                
                 <notebook>
-                    
-                    <page string="Selected Employees">
-                        <field name="target_employees_ids" readonly="1">
+                    <page>
+                        <field name="target_employees_ids" readonly="1" invisible="1">
                             <tree>
                                 <field name="id" invisible="1" string="" />
-                                <field name="name"/>
+                                <field name="name" invisible="1" string="" />
                             </tree>
                         </field>
                     </page>
                 </notebook>
+
                 <footer>
                     <!-- <button name="" type="object"
                             string="Preview"
