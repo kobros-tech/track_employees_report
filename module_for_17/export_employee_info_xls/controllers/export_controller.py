@@ -278,11 +278,11 @@ class XLSXReportController(http.Controller):
             # 1 cell
             emp_obj = request.env["hr.employee"].browse([emp_dict['id']])
             # 2 cell
-            if emp_obj.vendor_id:
-                worksheet.write(row, col+1, emp_obj.vendor_id)
-            # 3 cell
             if emp_obj.work_email:
-                worksheet.write(row, col+2, emp_obj.work_email)
+                worksheet.write(row, col+1, emp_obj.work_email)
+            # 3 cell
+            if emp_obj.emp_email:
+                worksheet.write(row, col+2, emp_obj.emp_email)
             # 4 cell
             if emp_obj.joining_date:
                 worksheet.write(row, col+3, emp_obj.joining_date)

@@ -11,7 +11,7 @@
                     <field name="joining_date"/>
                     <field name="section_manager"/>
                     <field name="director"/>
-                    <field name="vendor_id" string="Vendor ID"/>
+                    <field name="emp_email" string="Employee Email"/>
                     <field name="project_id"/>
                     <field name="location"/>
                 </group>
@@ -19,50 +19,50 @@
 
             <!-- work from home section customizing -->
             <xpath expr="//field[@name='monday_location_id']" position="replace">
-                <field name="monday_location_id" placeholder="Unspecified For Monday" force_save="1"/>
                 <group>
+                    <field name="monday_location_id" placeholder="Unspecified For Monday" force_save="1" string="Monday"/>
                     <field name="work_from_home_monday" string="From Home" invisible="not work_from_home_monday"/>
                 </group>
             </xpath>
 
             <xpath expr="//field[@name='tuesday_location_id']" position="replace">
-                <field name="tuesday_location_id" placeholder="Unspecified For Tuesday" force_save="1"/>
                 <group>
+                    <field name="tuesday_location_id" placeholder="Unspecified For Tuesday" force_save="1" string="Tuesday"/>
                     <field name="work_from_home_tuesday" string="From Home" invisible="not work_from_home_tuesday"/>
                 </group>
             </xpath>
 
             <xpath expr="//field[@name='wednesday_location_id']" position="replace">
-                <field name="wednesday_location_id" placeholder="Unspecified For Wednesday" force_save="1"/>
                 <group>
+                    <field name="wednesday_location_id" placeholder="Unspecified For Wednesday" force_save="1" string="Wednesday"/>
                     <field name="work_from_home_wednesday" string="From Home" invisible="not work_from_home_wednesday"/>
                 </group>
             </xpath>
 
             <xpath expr="//field[@name='thursday_location_id']" position="replace">
-                <field name="thursday_location_id" placeholder="Unspecified For Thursday" force_save="1"/>
                 <group>
+                    <field name="thursday_location_id" placeholder="Unspecified For Thursday" force_save="1" string="Thursday"/>
                     <field name="work_from_home_thursday" string="From Home" invisible="not work_from_home_thursday"/>
                 </group>
             </xpath>
 
             <xpath expr="//field[@name='friday_location_id']" position="replace">
-                <field name="friday_location_id" placeholder="Unspecified For Friday" force_save="1"/>
                 <group>
+                    <field name="friday_location_id" placeholder="Unspecified For Friday" force_save="1" string="Friday"/>
                     <field name="work_from_home_friday" string="From Home" invisible="not work_from_home_friday"/>
                 </group>
             </xpath>
 
             <xpath expr="//field[@name='saturday_location_id']" position="replace">
-                <field name="saturday_location_id" placeholder="Unspecified For Saturday" force_save="1"/>
                 <group>
+                    <field name="saturday_location_id" placeholder="Unspecified For Saturday" force_save="1" string="Saturday"/>
                     <field name="work_from_home_saturday" string="From Home" invisible="not work_from_home_saturday"/>
                 </group>
             </xpath>
 
             <xpath expr="//field[@name='sunday_location_id']" position="replace">
-                <field name="sunday_location_id" placeholder="Unspecified For Sunday" force_save="1"/>
                 <group>
+                    <field name="sunday_location_id" placeholder="Unspecified For Sunday" force_save="1" string="Sunday"/>
                     <field name="work_from_home_sunday" string="From Home" invisible="not work_from_home_sunday"/>
                 </group>
             </xpath>

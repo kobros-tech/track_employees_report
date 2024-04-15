@@ -89,13 +89,37 @@ class EmloyeeReport(models.TransientModel):
                 and they themselves are of type "odoo.api.project.project"
                 """
                 projects = rec.project_ids.mapped(lambda p: p._origin)
-
-                analytic_actions_2 = self.env["account.analytic.line"].search([("project_id", "in", projects.mapped("id"))])
-                distinct_emp_ids_2 = set(analytic_actions_2.mapped(lambda rec: rec.employee_id.id))
-                distinct_emp_recs_2 = self.env["hr.employee"].browse(distinct_emp_ids_2)
-                
                 target_ids_origin = rec.target_employees_ids.mapped(lambda rec: rec._origin)
-                common = target_ids_origin & distinct_emp_recs_2
+                
+                """
+                Based on timesheet records
+                """
+                # analytic_actions_2 = self.env["account.analytic.line"].search(
+                #     [("project_id", "in", projects.mapped("id"))]
+                # )
+                # distinct_emp_ids_2 = set(analytic_actions_2.mapped(lambda rec: rec.employee_id.id))
+                # distinct_emp_recs_2 = self.env["hr.employee"].browse(distinct_emp_ids_2)
+                # common = target_ids_origin & distinct_emp_recs_2
+
+                """
+                Based on project followers
+                """
+                followers = projects.mapped(lambda project: project.message_follower_ids)
+                follower_emp_recs_2 = self.env["hr.employee"].browse(followers.mapped("id"))
+                common = target_ids_origin & follower_emp_recs_2
+                
+                print("=========================================")
+                for employee in follower_emp_recs_2:
+                    print(employee, employee.name)
+                    print(employee.user_id, employee.user_id.name)
+                    tasks = self.env['project.task'].search([]).filtered(
+                        lambda task: 
+                            employee.user_id in task.user_ids
+                    )
+                    print(tasks)
+                    print(tasks.mapped("project_id"))
+                print("=========================================")
+
                 rec.target_employees_ids = common
 
             # filter employees according to specific selected employees

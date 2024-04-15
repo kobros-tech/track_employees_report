@@ -9,7 +9,7 @@ class WorkLocation(models.Model):
     joining_date = fields.Date()
     section_manager = fields.Char()
     director = fields.Char()
-    vendor_id = fields.Char()
+    emp_email = fields.Char()
     location = fields.Char()
     project_id = fields.Many2one("project.project")
 

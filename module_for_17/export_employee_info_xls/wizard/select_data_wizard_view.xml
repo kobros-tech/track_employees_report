@@ -5,9 +5,7 @@
         <field name="model">employee.xls.report</field>
         <field name="arch" type="xml">
             <form string="Wizard" js_class="PrintExcel">
-                <group>
-                    <field name="validate" string="Validated or Drafted" placeholder="Choose Status"/>
-                </group>
+
                 <group string="Date Period">
                     <group>
                         <field name="from_date"/>
@@ -22,6 +20,7 @@
                     </group>
                     <group string="Employee">
                         <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="validate" string="Validated or Drafted" placeholder="Choose Status"/>
                     </group> 
                 </group>
 
@@ -64,7 +63,7 @@
         <field name="target">new</field>
     </record>
     
-    <menuitem name="Emloyees Report"
+    <menuitem name="Emloyees Timesheet"
         parent="hr_timesheet.menu_timesheets_reports"
         id="export_excel"
         action="stock_xls_report_action"
