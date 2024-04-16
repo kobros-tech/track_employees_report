@@ -11,7 +11,7 @@ class WorkLocation(models.Model):
     director = fields.Char()
     emp_email = fields.Char()
     location = fields.Char()
-    project_id = fields.Many2one("project.project")
+    company = fields.Char()
 
     work_from_home_monday = fields.Boolean(
         "hr.work.location",

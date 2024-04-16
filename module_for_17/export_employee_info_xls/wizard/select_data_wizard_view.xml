@@ -17,6 +17,7 @@
                 <group>
                     <group string="Project">
                         <field name="project_ids" widget="many2many_tags"/>
+                        <field name="po"/>
                     </group>
                     <group string="Employee">
                         <field name="employee_ids" widget="many2many_tags"/>
@@ -31,16 +32,16 @@
                     </tree>
                 </field>
                 
-                <!-- <notebook>
+                <notebook>
                     <page>
-                        <field name="target_employees_ids" readonly="1" invisible="1">
+                        <field name="target_employees_ids" readonly="1">
                             <tree>
                                 <field name="id" invisible="1" string="" />
-                                <field name="name" invisible="1" string="" />
+                                <field name="name" string="" />
                             </tree>
                         </field>
                     </page>
-                </notebook> -->
+                </notebook>
 
                 <footer>
                     <!-- <button name="" type="object"

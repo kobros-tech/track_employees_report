@@ -26,6 +26,8 @@ class EmloyeeReport(models.TransientModel):
         string='Projects',
     )
 
+    po = fields.Char()
+
     employee_ids = fields.Many2many(
         'hr.employee',
         string='Employees',
@@ -64,7 +66,7 @@ class EmloyeeReport(models.TransientModel):
     #                 raise UserError(_("No any employees fit your filter entries"))
 
 
-    @api.depends("from_date", "to_date", "project_ids", "employee_ids")
+    @api.depends("from_date", "to_date", "project_ids", "employee_ids", "po")
     def _compute_employees_records(self):
         self.ensure_one()
 
@@ -121,6 +123,15 @@ class EmloyeeReport(models.TransientModel):
                 print("=========================================")
 
                 rec.target_employees_ids = common
+            
+            if rec.po:
+                target_ids_origin = rec.target_employees_ids.mapped(lambda rec: rec._origin)
+                po_projects = self.env['project.project'].search([("po", "ilike", rec.po)])
+                followers_2 = po_projects.mapped(lambda project: project.message_follower_ids)
+                follower_emp_recs_3 = self.env["hr.employee"].browse(followers_2.mapped("id"))
+                common = target_ids_origin & follower_emp_recs_3
+                rec.target_employees_ids = common
+
 
             # filter employees according to specific selected employees
             if rec.employee_ids:

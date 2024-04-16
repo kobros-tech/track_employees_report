@@ -12,7 +12,7 @@
                     <field name="section_manager"/>
                     <field name="director"/>
                     <field name="emp_email" string="Employee Email"/>
-                    <field name="project_id"/>
+                    <field name="company"/>
                     <field name="location"/>
                 </group>
             </xpath>

@@ -23,10 +23,26 @@ except ImportError:
 class XLSXReportController(http.Controller):
     """Controller to generate and print XLS reports."""
 
-    def get_account_analytic_line(self, employee, validate):
+    def get_account_analytic_line(self, employee, validate, project, from_date, to_date):
         # Main condition, analytic line for the employee
         
-        analytic_line = request.env['account.analytic.line'].search([("employee_id", "=", employee.id)])
+        analytic_line = request.env['account.analytic.line'].search(
+            [
+                "&", 
+                    ("employee_id", "=", employee.id), 
+                    "&", 
+                        ("project_id", "=", project.id),
+                        "&", 
+                            ("date", ">=", from_date), 
+                            ("date", "<=", to_date)
+            ]
+        )
+
+        # print("ANALYTIC LINE:")
+        # print(analytic_line)
+        # print(analytic_line.mapped("project_id"))
+        # print(analytic_line.mapped("task_id"))
+        # print("ANALYTIC LINE...")
         
         if validate == "validate":
             result = analytic_line.filtered(
@@ -103,12 +119,29 @@ class XLSXReportController(http.Controller):
 
 
     def check_work_day(self, employee, analytic_line, step_date):
-        lines = analytic_line.search([("date", "=", step_date)])
+        
+        lines = analytic_line.filtered(
+            lambda line:
+                line.date == step_date
+        )
+
         prefix = False
 
+        print("LINES Before:", analytic_line)
+        print("LINES Before:", analytic_line.mapped("date"))
+        print("LINES Before:", analytic_line.mapped("project_id"))
+        print("LINES After:", lines)
+
         for line in lines:
-            if (not line.global_leave_id) and (not line.holiday_id) and line.unit_amount > 0.0:
+            if (not line.global_leave_id) and (not line.holiday_id) and (line.unit_amount > 0.0) and (step_date == line.date):
                 
+                print("step_date:", step_date)
+                print("line_date:", line.date)
+                print("display_name", line.display_name)
+                print("name", line.name)
+                print("unit_amount", line.unit_amount)
+                print("employee", line.employee_id)
+
                 day_num = step_date.isoweekday()
                 
                 if day_num == 1 and employee.work_from_home_monday:
@@ -127,8 +160,11 @@ class XLSXReportController(http.Controller):
                     prefix = "W"
                 else:
                     prefix = "P"
+                
+                break
             
-        
+        print("step_date", step_date, "prefix", prefix)
+
         if prefix != False:
             return True, prefix
         else:
@@ -136,29 +172,24 @@ class XLSXReportController(http.Controller):
 
     
     def append_day(self, time_off_list, step_date, letter):
-        print("time_off_list 2", time_off_list)
+        # print("time_off_list 2", time_off_list)
         time_off_list.append(
-            [
-                {
-                    "step_date": step_date,
-                },
-
-                {
-                    "time_off": letter,
-                }
-            ]
+            {
+                "step_date": step_date,
+                "time_off": letter,
+            },
         )
 
         return time_off_list
 
 
 
-    def get_target_employees_days(self, employee, from_date, to_date, validate):
+    def get_target_employees_days(self, employee, from_date, to_date, validate, project):
 
         """
             Mehtod will get three arguments [employee, from_date, to_date]
         """
-        print("Time Off for employee: ", employee.name)
+        # print("Time Off for employee: ", employee.name)
 
         # ------------------------------------------- Defaults -------------------------------------------
         # ------------------------------------------------------------------------------------------------
@@ -170,17 +201,20 @@ class XLSXReportController(http.Controller):
         filtered_time_off = self.get_filtered_timeoff(employee, from_date, to_date)
         
         # Main condition, analytic line for the employee
-        analytic_line = self.get_account_analytic_line(employee, validate)
+        analytic_line = self.get_account_analytic_line(employee, validate, project, from_date, to_date)
 
         print("Analytic Line is:", analytic_line)
-        for line in analytic_line:
-            print(line.display_name)
-            print(line.name)
-            print(line.global_leave_id.name)
-            print(line.holiday_id.name)
-            print(line.unit_amount)
-            print(line.validated_status)
-            print(line.validated)
+        # for line in analytic_line:
+        #     print(line.date)
+        #     print(line.display_name)
+        #     print(line.name)
+        #     print(line.project_id)
+        #     print(line.task_id)
+        #     print(line.global_leave_id.name)
+        #     print(line.holiday_id.name)
+        #     print(line.unit_amount)
+        #     print(line.validated_status)
+        #     print(line.validated)
 
         # public hoidays to check within before returning time off days
         public_holidays = request.env["resource.calendar.leaves"].search([]).filtered(
@@ -195,43 +229,40 @@ class XLSXReportController(http.Controller):
         # ------------------------------------------------------------------------------------------------
 
         for i in range(number_of_days + 1):
-            if step_date in analytic_line.mapped("date"):
-                print("^^^^^^^^^^^^")
-                print("I am recorded")
-                print(analytic_line.search([("date", "=", step_date)]))
-                print("^^^^^^^^^^^^")
-
-                public_holiday_result = self.check_public_holiday(public_holidays, step_date)
-                timeoff_result, timeoff_prefix = self.check_time_off(filtered_time_off, step_date)
-                work_day_result, work_day_prefix = self.check_work_day(employee, analytic_line, step_date)
-
-                if public_holiday_result:
-                    time_off_list = self.append_day(time_off_list, step_date, "H")
-                elif timeoff_result:
-                    time_off_list = self.append_day(time_off_list, step_date, timeoff_prefix)
-                elif step_date.isoweekday() in [5, 6]:
-                    time_off_list = self.append_day(time_off_list, step_date, "")
-                elif work_day_result:
-                    time_off_list = self.append_day(time_off_list, step_date, work_day_prefix)
-                else:
-                    time_off_list = self.append_day(time_off_list, step_date, "")
+            public_holiday_result = self.check_public_holiday(public_holidays, step_date)
+            timeoff_result, timeoff_prefix = self.check_time_off(filtered_time_off, step_date)
+            work_day_result, work_day_prefix = self.check_work_day(employee, analytic_line, step_date)
+            
+            if work_day_result:
+                time_off_list = self.append_day(time_off_list, step_date, work_day_prefix)
+                print("work_day_result")
+            elif public_holiday_result:
+                time_off_list = self.append_day(time_off_list, step_date, "H")
+                print("public_holiday_result")
+            elif timeoff_result:
+                time_off_list = self.append_day(time_off_list, step_date, timeoff_prefix)
+                print("timeoff_result")
+            elif step_date.isoweekday() in [5, 6]:
+                time_off_list = self.append_day(time_off_list, step_date, "")
+                print("work_day_result")
             else:
                 time_off_list = self.append_day(time_off_list, step_date, "")
+                print("else_1")
+            
 
             
             # append day before starting a new loop
             step_date = fields.Date.add(from_date, days=i+1)
 
-        for item in time_off_list:
-            print(item)
+        # for item in time_off_list:
+        #     print(item)
 
         return time_off_list
 
 
-    
 
-    def get_xlsx_report(self, data):
-        # initializing
+    def prepare_excel_list(self, data):
+
         from_date = datetime.date(
             data['from_date']['year'], 
             data['from_date']['month'], 
@@ -244,8 +275,72 @@ class XLSXReportController(http.Controller):
         
         validate = data['validate']
         
+        employees_list = data['hr.employee']
+        projects_list = data['project.project']
+
         number_of_days = (to_date - from_date).days + 1
 
+        projects = request.env['project.project']
+        excel_list = []
+
+        print("==================================")
+        print(data)
+        print(from_date, to_date, validate, len(projects_list))
+        
+        for emp_dict in employees_list:
+            employee = request.env['hr.employee'].browse([emp_dict['id']])
+            print("employee record:", employee)
+
+            if len(projects_list) == 0:
+                print("Not accessed")
+                tasks = request.env['project.task'].search([]).filtered(
+                    lambda task: 
+                        employee.user_id in task.user_ids
+                )
+                print(tasks)
+                projects = tasks.mapped("project_id")
+            elif len(projects_list) > 0:
+                print("accessed")
+                for item in projects_list:
+                    print("item", item['display_name'])
+                    projects |= request.env['project.project'].search([
+                        ("name", "=", item['display_name'])
+                    ])
+                
+                print("Projects:", projects.mapped("display_name"))
+
+            print(projects)
+            for project in projects:
+                timeoff_result = self.get_target_employees_days(
+                    employee, from_date, to_date, validate, project
+                )
+
+                excel_list.append(
+                    {
+                        'employee': employee, 
+                        'project': project,
+                        'timeoff_result': timeoff_result,
+                    }
+                )
+            
+        
+        print("----------------------------------------------")
+        print("Excel List:")
+        for item in excel_list:
+            print(item)
+            print("\n")
+        print("----------------------------------------------")
+
+        return excel_list
+
+
+            
+
+    
+
+    def get_xlsx_report(self, data):
+        
+        # initializing
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet('Project Info')
@@ -255,9 +350,9 @@ class XLSXReportController(http.Controller):
         v_format = workbook.add_format({'bold': True, 'bg_color': '#70AD47', 'font_color': 'white' })
         h_format = workbook.add_format({'bold': True, 'bg_color': '#FFFF00', 'font_color': 'black' })
         s_format = workbook.add_format({'bold': True, 'bg_color': 'red', 'font_color': 'white' })
+        w_format = workbook.add_format({'bold': True, 'bg_color': '#29344C', 'font_color': 'white' })
 
         # writing data
-        employees_list_of_dicts = data['hr.employee']
         worksheet.write(0, 0, "#", heading_format)
         worksheet.write(0, 1, "Name", heading_format)
         worksheet.write(0, 2, "Employee Vendor ID", heading_format)
@@ -272,11 +367,16 @@ class XLSXReportController(http.Controller):
 
         row = 1
         col = 1
-        for emp_dict in employees_list_of_dicts:
+        for dict_row in data:
+            emp_obj = dict_row['employee']
+            project_obj = dict_row['project']
+            timeoff_result = dict_row['timeoff_result']
+
             # 0 cell
-            worksheet.write(row, col, emp_dict['name'])
+            
             # 1 cell
-            emp_obj = request.env["hr.employee"].browse([emp_dict['id']])
+            if emp_obj.name:
+                worksheet.write(row, col, emp_obj.name)
             # 2 cell
             if emp_obj.work_email:
                 worksheet.write(row, col+1, emp_obj.work_email)
@@ -296,40 +396,41 @@ class XLSXReportController(http.Controller):
             if emp_obj.director:
                 worksheet.write(row, col+6, emp_obj.director)
             # 8 cell
-            if emp_obj.address_id:
-                worksheet.write(row, col+7, emp_obj.address_id.name)
+            if emp_obj.company:
+                worksheet.write(row, col+7, emp_obj.company)
             # 9 cell
             if emp_obj.job_id:
                 worksheet.write(row, col+8, emp_obj.job_id.name)
             # 10 cell
-            if emp_obj.project_id.po:
-                worksheet.write(row, col+9, emp_obj.project_id.po)
+            if project_obj.po:
+                worksheet.write(row, col+9, project_obj.po)
 
-            timeoff_result = self.get_target_employees_days(emp_obj, from_date, to_date, validate)
             appended_cols = len(timeoff_result)
             
             for i in range(appended_cols):
-                step_day = timeoff_result[i][0]['step_date'].strftime('%d')
+                step_day = timeoff_result[i]['step_date'].strftime('%d')
                 worksheet.write(0, col+9+i+1, step_day, heading_format)
                 
-                timeoff = timeoff_result[i][1]['time_off']
+                timeoff = timeoff_result[i]['time_off']
                 if timeoff == "V":
                     worksheet.write(row, col+9+i+1, timeoff, v_format)
                 elif timeoff == "H":
                     worksheet.write(row, col+9+i+1, timeoff, h_format)
                 elif timeoff == "S":
                     worksheet.write(row, col+9+i+1, timeoff, s_format)
+                elif timeoff == "W":
+                    worksheet.write(row, col+9+i+1, timeoff, w_format)
                 else:
                     worksheet.write(row, col+9+i+1, timeoff)
             
             # before last cell
-            worksheet.write(0, col+9+number_of_days+1, "Location", heading_format)
+            worksheet.write(0, col+9+appended_cols+1, "Location", heading_format)
             if emp_obj.location:
-                worksheet.write(row, col+9+number_of_days+1, emp_obj.location)
+                worksheet.write(row, col+9+appended_cols+1, emp_obj.location)
             # last cell
-            worksheet.write(0, col+9+number_of_days+2, "Nationality", heading_format)
+            worksheet.write(0, col+9+appended_cols+2, "Nationality", heading_format)
             if emp_obj.country_id:
-                worksheet.write(row, col+9+number_of_days+2, emp_obj.country_id.name)
+                worksheet.write(row, col+9+appended_cols+2, emp_obj.country_id.name)
 
             row += 1
 
@@ -342,8 +443,14 @@ class XLSXReportController(http.Controller):
     def get_employee_xlsx_report(self, data, **kw):
         report_obj = request.env["employee.xls.report"]
         data = json.loads(data)
+        
+        excel_list = self.prepare_excel_list(data)
+        print("============= Excel List =============")
+        print(excel_list)
+        print("============= Excel List =============")
+        
         filename = "employee_timesheet_report"
-        xlsx_data = self.get_xlsx_report(data)
+        xlsx_data = self.get_xlsx_report(excel_list)
         response = request.make_response(
             xlsx_data,
             headers=[
