@@ -376,6 +376,7 @@ class XLSXReportController(http.Controller):
 
             # 0 cell
             worksheet.write(row, 0, row)
+            worksheet.set_column(0, 0, 3)
             # 1 cell
             if emp_obj.name:
                 worksheet.write(row, col, emp_obj.name)
@@ -422,6 +423,7 @@ class XLSXReportController(http.Controller):
             for i in range(appended_cols):
                 step_day = timeoff_result[i]['step_date'].strftime('%d')
                 worksheet.write(0, col+9+i+1, step_day, heading_format)
+                worksheet.set_column(col+9+i+1, col+9+i+1, 3)
                 
                 timeoff = timeoff_result[i]['time_off']
                 if timeoff == "V":
