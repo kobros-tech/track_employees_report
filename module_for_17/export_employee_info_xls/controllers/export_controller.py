@@ -341,6 +341,8 @@ class XLSXReportController(http.Controller):
     def get_xlsx_report(self, data):
         
         # initializing
+        timeoffResult = data[0]['timeoff_result']
+        appendedCols = len(timeoffResult)
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet('Project Info')
@@ -377,34 +379,44 @@ class XLSXReportController(http.Controller):
             # 1 cell
             if emp_obj.name:
                 worksheet.write(row, col, emp_obj.name)
+                worksheet.set_column(col, col, 30)
             # 2 cell
             if emp_obj.work_email:
                 worksheet.write(row, col+1, emp_obj.work_email)
+                worksheet.set_column(col+1, col+1, 30)
             # 3 cell
             if emp_obj.emp_email:
                 worksheet.write(row, col+2, emp_obj.emp_email)
+                worksheet.set_column(col+2, col+2, 30)
             # 4 cell
             if emp_obj.joining_date:
                 worksheet.write(row, col+3, emp_obj.joining_date)
+                worksheet.set_column(col+3, col+3, 30)
             # 5 cell
             if emp_obj.gender:
                 worksheet.write(row, col+4, emp_obj.gender)
+                worksheet.set_column(col+4, col+4, 30)
             # 6 cell
             if emp_obj.section_manager:
                 worksheet.write(row, col+5, emp_obj.section_manager)
+                worksheet.set_column(col+5, col+5, 30)
             # 7 cell
             if emp_obj.director:
                 worksheet.write(row, col+6, emp_obj.director)
+                worksheet.set_column(col+6, col+6, 30)
             # 8 cell
             if emp_obj.company:
                 worksheet.write(row, col+7, emp_obj.company)
+                worksheet.set_column(col+7, col+7, 30)
             # 9 cell
             if emp_obj.job_id:
                 worksheet.write(row, col+8, emp_obj.job_id.name)
+                worksheet.set_column(col+8, col+8, 30)
             # 10 cell
             if project_obj.po:
                 worksheet.write(row, col+9, project_obj.po)
-
+                worksheet.set_column(col+9, col+9, 30)
+                
             appended_cols = len(timeoff_result)
             
             for i in range(appended_cols):
@@ -427,10 +439,12 @@ class XLSXReportController(http.Controller):
             worksheet.write(0, col+9+appended_cols+1, "Location", heading_format)
             if emp_obj.location:
                 worksheet.write(row, col+9+appended_cols+1, emp_obj.location)
+                worksheet.set_column(col+9+appendedCols+1, col+9+appendedCols+1, 30)
             # last cell
             worksheet.write(0, col+9+appended_cols+2, "Nationality", heading_format)
             if emp_obj.country_id:
                 worksheet.write(row, col+9+appended_cols+2, emp_obj.country_id.name)
+                worksheet.set_column(col+9+appendedCols+2, col+9+appendedCols+2, 30)
 
             row += 1
 
