@@ -373,7 +373,7 @@ class XLSXReportController(http.Controller):
             timeoff_result = dict_row['timeoff_result']
 
             # 0 cell
-            
+            worksheet.write(row, 0, row)
             # 1 cell
             if emp_obj.name:
                 worksheet.write(row, col, emp_obj.name)

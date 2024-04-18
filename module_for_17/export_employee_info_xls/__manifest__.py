@@ -20,7 +20,7 @@
 #
 ###############################################################################
 {
-    'name': 'Export Employee info in Excel',
+    'name': 'Employee Timesheet',
     'version': '17.0.0.0.0',
     'summary': 'Advanced PDF & XLS reports for employees timesheet info.',
     'description': 'Advanced PDF & XLS reports for employees timesheet info',
