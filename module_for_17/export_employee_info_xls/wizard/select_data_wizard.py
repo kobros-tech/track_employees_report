@@ -111,10 +111,10 @@ class EmloyeeReport(models.TransientModel):
                 project_employees = self.env['hr.employee'].search([("user_id", "in", project_assignees.mapped("id"))])
                 common = target_ids_origin & project_employees
 
-                print("=========================================")
-                print("project_assignees", project_assignees)
-                print("project_employees", project_employees)
-                print("=========================================")
+                # print("=========================================")
+                # print("project_assignees", project_assignees)
+                # print("project_employees", project_employees)
+                # print("=========================================")
 
                 rec.target_employees_ids = common
             
@@ -126,10 +126,10 @@ class EmloyeeReport(models.TransientModel):
                 project_employees = self.env['hr.employee'].search([("user_id", "in", project_assignees.mapped("id"))])
                 common = target_ids_origin & project_employees
 
-                print("=========================================")
-                print("project_assignees", project_assignees)
-                print("project_employees", project_employees)
-                print("=========================================")
+                # print("=========================================")
+                # print("project_assignees", project_assignees)
+                # print("project_employees", project_employees)
+                # print("=========================================")
 
                 rec.target_employees_ids = common
 

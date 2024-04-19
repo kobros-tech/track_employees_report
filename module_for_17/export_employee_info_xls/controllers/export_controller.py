@@ -127,20 +127,20 @@ class XLSXReportController(http.Controller):
 
         prefix = False
 
-        print("LINES Before:", analytic_line)
-        print("LINES Before:", analytic_line.mapped("date"))
-        print("LINES Before:", analytic_line.mapped("project_id"))
-        print("LINES After:", lines)
+        # print("LINES Before:", analytic_line)
+        # print("LINES Before:", analytic_line.mapped("date"))
+        # print("LINES Before:", analytic_line.mapped("project_id"))
+        # print("LINES After:", lines)
 
         for line in lines:
             if (not line.global_leave_id) and (not line.holiday_id) and (line.unit_amount > 0.0) and (step_date == line.date):
                 
-                print("step_date:", step_date)
-                print("line_date:", line.date)
-                print("display_name", line.display_name)
-                print("name", line.name)
-                print("unit_amount", line.unit_amount)
-                print("employee", line.employee_id)
+                # print("step_date:", step_date)
+                # print("line_date:", line.date)
+                # print("display_name", line.display_name)
+                # print("name", line.name)
+                # print("unit_amount", line.unit_amount)
+                # print("employee", line.employee_id)
 
                 day_num = step_date.isoweekday()
                 
@@ -163,7 +163,7 @@ class XLSXReportController(http.Controller):
                 
                 break
             
-        print("step_date", step_date, "prefix", prefix)
+        # print("step_date", step_date, "prefix", prefix)
 
         if prefix != False:
             return True, prefix
@@ -203,7 +203,7 @@ class XLSXReportController(http.Controller):
         # Main condition, analytic line for the employee
         analytic_line = self.get_account_analytic_line(employee, validate, project, from_date, to_date)
 
-        print("Analytic Line is:", analytic_line)
+        # print("Analytic Line is:", analytic_line)
         # for line in analytic_line:
         #     print(line.date)
         #     print(line.display_name)
@@ -235,19 +235,19 @@ class XLSXReportController(http.Controller):
             
             if work_day_result:
                 time_off_list = self.append_day(time_off_list, step_date, work_day_prefix)
-                print("work_day_result")
+                # print("work_day_result")
             elif public_holiday_result:
                 time_off_list = self.append_day(time_off_list, step_date, "H")
-                print("public_holiday_result")
+                # print("public_holiday_result")
             elif timeoff_result:
                 time_off_list = self.append_day(time_off_list, step_date, timeoff_prefix)
-                print("timeoff_result")
+                # print("timeoff_result")
             elif step_date.isoweekday() in [5, 6]:
                 time_off_list = self.append_day(time_off_list, step_date, "")
-                print("work_day_result")
+                # print("work_day_result")
             else:
                 time_off_list = self.append_day(time_off_list, step_date, "")
-                print("else_1")
+                # print("else_1")
             
 
             
@@ -283,33 +283,33 @@ class XLSXReportController(http.Controller):
         projects = request.env['project.project']
         excel_list = []
 
-        print("==================================")
-        print(data)
-        print(from_date, to_date, validate, len(projects_list))
+        # print("==================================")
+        # print(data)
+        # print(from_date, to_date, validate, len(projects_list))
         
         for emp_dict in employees_list:
             employee = request.env['hr.employee'].browse([emp_dict['id']])
-            print("employee record:", employee)
+            # print("employee record:", employee)
 
             if len(projects_list) == 0:
-                print("Not accessed")
+                # print("Not accessed")
                 tasks = request.env['project.task'].search([]).filtered(
                     lambda task: 
                         employee.user_id in task.user_ids
                 )
-                print(tasks)
+                # print(tasks)
                 projects = tasks.mapped("project_id")
             elif len(projects_list) > 0:
-                print("accessed")
+                # print("accessed")
                 for item in projects_list:
-                    print("item", item['display_name'])
+                    # print("item", item['display_name'])
                     projects |= request.env['project.project'].search([
                         ("name", "=", item['display_name'])
                     ])
                 
-                print("Projects:", projects.mapped("display_name"))
+                # print("Projects:", projects.mapped("display_name"))
 
-            print(projects)
+            # print(projects)
             for project in projects:
                 timeoff_result = self.get_target_employees_days(
                     employee, from_date, to_date, validate, project
@@ -324,12 +324,12 @@ class XLSXReportController(http.Controller):
                 )
             
         
-        print("----------------------------------------------")
-        print("Excel List:")
-        for item in excel_list:
-            print(item)
-            print("\n")
-        print("----------------------------------------------")
+        # print("----------------------------------------------")
+        # print("Excel List:")
+        # for item in excel_list:
+            # print(item)
+            # print("\n")
+        # print("----------------------------------------------")
 
         return excel_list
 
@@ -461,9 +461,9 @@ class XLSXReportController(http.Controller):
         data = json.loads(data)
         
         excel_list = self.prepare_excel_list(data)
-        print("============= Excel List =============")
-        print(excel_list)
-        print("============= Excel List =============")
+        # print("============= Excel List =============")
+        # print(excel_list)
+        # print("============= Excel List =============")
         
         filename = "employee_timesheet_report"
         xlsx_data = self.get_xlsx_report(excel_list)
