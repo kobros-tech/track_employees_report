@@ -380,7 +380,7 @@ class XLSXReportController(http.Controller):
             # 1 cell
             if emp_obj.name:
                 worksheet.write(row, col, emp_obj.name)
-                worksheet.set_column(col, col, 30)
+                worksheet.set_column(col, col, 45)
             # 2 cell
             if emp_obj.work_email:
                 worksheet.write(row, col+1, emp_obj.work_email)
@@ -396,7 +396,7 @@ class XLSXReportController(http.Controller):
             # 5 cell
             if emp_obj.gender:
                 worksheet.write(row, col+4, emp_obj.gender)
-                worksheet.set_column(col+4, col+4, 30)
+                worksheet.set_column(col+4, col+4, 10)
             # 6 cell
             if emp_obj.section_manager:
                 worksheet.write(row, col+5, emp_obj.section_manager)

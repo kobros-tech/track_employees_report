@@ -21,7 +21,7 @@
                     </group>
                     <group string="Employee">
                         <field name="employee_ids" widget="many2many_tags"/>
-                        <field name="validate" string="Validated or Drafted" placeholder="Choose Status"/>
+                        <field name="validate" string="Status" placeholder="Choose Status"/>
                     </group> 
                 </group>
 
@@ -32,7 +32,7 @@
                     </tree>
                 </field>
                 
-                <!-- <notebook>
+                <notebook>
                     <page>
                         <field name="target_employees_ids" readonly="1">
                             <tree>
@@ -41,7 +41,7 @@
                             </tree>
                         </field>
                     </page>
-                </notebook> -->
+                </notebook>
 
                 <footer>
                     <!-- <button name="" type="object"
@@ -56,7 +56,7 @@
     </record>
 
     <record model='ir.actions.act_window' id='stock_xls_report_action'>
-        <field name="name">Employee Time Sheet</field>
+        <field name="name">Employee Timesheet</field>
         <field name="res_model">employee.xls.report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="view_mode">form</field>
@@ -65,8 +65,8 @@
     </record>
     
     <menuitem name="Emloyees Timesheet"
-        parent="hr_timesheet.menu_timesheets_reports"
+        parent="hr_timesheet.timesheet_menu_root"
         id="export_excel"
         action="stock_xls_report_action"
-        sequence="3"/>
+        sequence="100"/>
 </odoo>

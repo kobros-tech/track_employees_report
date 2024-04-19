@@ -35,9 +35,9 @@ class EmloyeeReport(models.TransientModel):
 
     validate = fields.Selection(
         [
-            ("validate", "Validated"),
             ("draft", "Drafted"),
-            ("all", "Validated and Drafted"),
+            ("validate", "Validated"),
+            ("all", "Drafted and Validated"),
         ],
         required=True,
     )
@@ -75,14 +75,14 @@ class EmloyeeReport(models.TransientModel):
             if not rec.target_employees_ids:
                 rec.target_employees_ids = rec.env['hr.employee'].search([])
 
-            # filter employees according to specific date range
-            if rec.from_date and rec.to_date:
-                analytic_actions = self.env["account.analytic.line"].search(["&", ("date", ">=", rec.from_date), ("date", "<=", rec.to_date)])
-                distinct_emp_ids = set(analytic_actions.mapped(lambda rec: rec.employee_id.id))
-                distinct_emp_recs = self.env["hr.employee"].browse(distinct_emp_ids)
-                target_ids_origin = rec.target_employees_ids.mapped(lambda rec: rec._origin)
-                common = target_ids_origin & distinct_emp_recs
-                rec.target_employees_ids = common
+            # # filter employees according to specific date range
+            # if rec.from_date and rec.to_date:
+            #     analytic_actions = self.env["account.analytic.line"].search(["&", ("date", ">=", rec.from_date), ("date", "<=", rec.to_date)])
+            #     distinct_emp_ids = set(analytic_actions.mapped(lambda rec: rec.employee_id.id))
+            #     distinct_emp_recs = self.env["hr.employee"].browse(distinct_emp_ids)
+            #     target_ids_origin = rec.target_employees_ids.mapped(lambda rec: rec._origin)
+            #     common = target_ids_origin & distinct_emp_recs
+            #     rec.target_employees_ids = common
             
             # filter employees according to specific project selection
             if rec.project_ids:
@@ -106,20 +106,14 @@ class EmloyeeReport(models.TransientModel):
                 """
                 Based on project followers
                 """
-                followers = projects.mapped(lambda project: project.message_follower_ids)
-                follower_emp_recs_2 = self.env["hr.employee"].browse(followers.mapped("id"))
-                common = target_ids_origin & follower_emp_recs_2
-                
+                tasks = projects.mapped(lambda project: project.task_ids)
+                project_assignees = tasks.mapped("user_ids")
+                project_employees = self.env['hr.employee'].search([("user_id", "in", project_assignees.mapped("id"))])
+                common = target_ids_origin & project_employees
+
                 print("=========================================")
-                for employee in follower_emp_recs_2:
-                    print(employee, employee.name)
-                    print(employee.user_id, employee.user_id.name)
-                    tasks = self.env['project.task'].search([]).filtered(
-                        lambda task: 
-                            employee.user_id in task.user_ids
-                    )
-                    print(tasks)
-                    print(tasks.mapped("project_id"))
+                print("project_assignees", project_assignees)
+                print("project_employees", project_employees)
                 print("=========================================")
 
                 rec.target_employees_ids = common
@@ -127,9 +121,16 @@ class EmloyeeReport(models.TransientModel):
             if rec.po:
                 target_ids_origin = rec.target_employees_ids.mapped(lambda rec: rec._origin)
                 po_projects = self.env['project.project'].search([("po", "ilike", rec.po)])
-                followers_2 = po_projects.mapped(lambda project: project.message_follower_ids)
-                follower_emp_recs_3 = self.env["hr.employee"].browse(followers_2.mapped("id"))
-                common = target_ids_origin & follower_emp_recs_3
+                tasks = po_projects.mapped(lambda project: project.task_ids)
+                project_assignees = tasks.mapped("user_ids")
+                project_employees = self.env['hr.employee'].search([("user_id", "in", project_assignees.mapped("id"))])
+                common = target_ids_origin & project_employees
+
+                print("=========================================")
+                print("project_assignees", project_assignees)
+                print("project_employees", project_employees)
+                print("=========================================")
+
                 rec.target_employees_ids = common
 
 

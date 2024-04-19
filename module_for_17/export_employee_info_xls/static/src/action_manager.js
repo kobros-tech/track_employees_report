@@ -13,7 +13,10 @@ class PrintExcel extends Component {
     }
 
     get showButton() {
-        if (this.props.record.data.validate && this.props.record.data.from_date && this.props.record.data.to_date) {
+        if (this.props.record.data.validate && 
+            this.props.record.data.from_date && 
+            this.props.record.data.to_date && 
+            this.props.record.data.target_employees_ids.records.length > 0) {
             return false
         }
         else {

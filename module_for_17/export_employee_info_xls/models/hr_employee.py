@@ -6,12 +6,12 @@ class WorkLocation(models.Model):
 
     _inherit = "hr.employee"
 
-    joining_date = fields.Date()
-    section_manager = fields.Char()
-    director = fields.Char()
-    emp_email = fields.Char()
-    location = fields.Char()
-    company = fields.Char()
+    joining_date = fields.Date(groups="hr.group_hr_user", tracking=True)
+    section_manager = fields.Char(groups="hr.group_hr_user", tracking=True)
+    director = fields.Char(groups="hr.group_hr_user", tracking=True)
+    emp_email = fields.Char(groups="hr.group_hr_user", tracking=True)
+    location = fields.Char(groups="hr.group_hr_user", tracking=True)
+    company = fields.Char(groups="hr.group_hr_user", tracking=True)
 
     work_from_home_monday = fields.Boolean(
         "hr.work.location",
