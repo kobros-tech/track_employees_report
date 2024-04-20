@@ -13,6 +13,7 @@ import json
 from datetime import datetime
 import datetime
 import pytz
+from odoo.exceptions import ValidationError
 try:
     from odoo.tools.misc import xlsxwriter
 except ImportError:
@@ -339,6 +340,9 @@ class XLSXReportController(http.Controller):
     
 
     def get_xlsx_report(self, data):
+
+        if len(data) == 0:
+            raise ValidationError("Did not find any matching employees")
         
         # initializing
         timeoffResult = data[0]['timeoff_result']
