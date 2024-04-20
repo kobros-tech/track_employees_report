@@ -277,19 +277,39 @@ class XLSXReportController(http.Controller):
         validate = data['validate']
         
         employees_list = data['hr.employee']
+        employees_list_2 = data['employee']
         projects_list = data['project.project']
 
         number_of_days = (to_date - from_date).days + 1
 
         projects = request.env['project.project']
+        employees = request.env['hr.employee']
+        
+        if len(employees_list_2) > 0:
+            for item in employees_list_2:
+                item_employee = request.env['hr.employee'].browse([item['id']])
+                employees |= item_employee
+        elif len(projects_list) > 0:
+            for item in projects_list:
+                item_project = request.env['project.project'].browse([
+                    item['id']
+                ])
+
+                item_tasks = item_project.task_ids
+                item_assignees = item_tasks.mapped("user_ids")
+                item_employees = request.env['hr.employee'].search([("user_id", "in", item_assignees.mapped("id"))])
+                employees |= item_employees
+        else:
+            employees = request.env['hr.employee'].search([])
+
         excel_list = []
 
-        # print("==================================")
-        # print(data)
-        # print(from_date, to_date, validate, len(projects_list))
+        print("==================================")
+        print(employees)
+        print(projects)
+        print("==================================")
         
-        for emp_dict in employees_list:
-            employee = request.env['hr.employee'].browse([emp_dict['id']])
+        for employee in employees:
             # print("employee record:", employee)
 
             if len(projects_list) == 0:
@@ -303,14 +323,13 @@ class XLSXReportController(http.Controller):
             elif len(projects_list) > 0:
                 # print("accessed")
                 for item in projects_list:
-                    # print("item", item['display_name'])
-                    projects |= request.env['project.project'].search([
-                        ("name", "=", item['display_name'])
+                    projects |= request.env['project.project'].browse([
+                        item['id']
                     ])
                 
                 # print("Projects:", projects.mapped("display_name"))
 
-            # print(projects)
+            
             for project in projects:
                 timeoff_result = self.get_target_employees_days(
                     employee, from_date, to_date, validate, project
@@ -324,7 +343,7 @@ class XLSXReportController(http.Controller):
                     }
                 )
             
-        
+        print(projects)
         # print("----------------------------------------------")
         # print("Excel List:")
         # for item in excel_list:
@@ -465,9 +484,9 @@ class XLSXReportController(http.Controller):
         data = json.loads(data)
         
         excel_list = self.prepare_excel_list(data)
-        # print("============= Excel List =============")
-        # print(excel_list)
-        # print("============= Excel List =============")
+        print("============= Excel List =============")
+        print(data)
+        print("============= Excel List =============")
         
         filename = "employee_timesheet_report"
         xlsx_data = self.get_xlsx_report(excel_list)

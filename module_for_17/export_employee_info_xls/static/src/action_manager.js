@@ -29,12 +29,20 @@ class PrintExcel extends Component {
 
         const projects = this.props.record.data.project_ids.records
         const employees = this.props.record.data.target_employees_ids.records
+        const employees_2 = this.props.record.data.employee_ids.records
         const from_date = this.props.record.data.from_date.c
         const to_date = this.props.record.data.to_date.c
         const validate = this.props.record.data.validate
         
         const projects_ids = projects.map((project) =>{
-            return project.data;
+            let name = project.data.display_name;
+            let id = project.evalContext.active_id;
+            return { name, id };
+        })
+        const selected_employees_ids = employees_2.map((employee) =>{
+            let name = employee.data.display_name;
+            let id = employee.evalContext.active_id;
+            return { name, id } 
         })
         const target_employees_ids = employees.map((employee) =>{
             return employee.data;
@@ -43,11 +51,13 @@ class PrintExcel extends Component {
         const data = { 
             "project.project": projects_ids, 
             "hr.employee": target_employees_ids,
+            "employee": selected_employees_ids,
             from_date: from_date,
             to_date: to_date,
             validate: validate,
         };
-        
+        console.log(this.props.record.data.project_ids.records)
+        console.log(data, projects_ids)
         download({
             url: '/employee_xlsx_report',
             data: { data: JSON.stringify(data) },
