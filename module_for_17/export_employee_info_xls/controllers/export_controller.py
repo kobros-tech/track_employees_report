@@ -297,10 +297,10 @@ class XLSXReportController(http.Controller):
 
                 item_tasks = item_project.task_ids
                 item_assignees = item_tasks.mapped("user_ids")
-                item_employees = request.env['hr.employee'].search([("user_id", "in", item_assignees.mapped("id"))])
+                item_employees = request.env['hr.employee'].search(["&", ('active', '=', True), ("user_id", "in", item_assignees.mapped("id"))])
                 employees |= item_employees
         else:
-            employees = request.env['hr.employee'].search([])
+            employees = request.env['hr.employee'].search([('active', '=', True)])
 
         excel_list = []
 
@@ -343,13 +343,13 @@ class XLSXReportController(http.Controller):
                     }
                 )
             
-        # print(projects)
-        # print("----------------------------------------------")
-        # print("Excel List:")
-        # for item in excel_list:
-            # print(item)
-            # print("\n")
-        # print("----------------------------------------------")
+        print(projects)
+        print("----------------------------------------------")
+        print("Excel List:")
+        for item in excel_list:
+            print(item)
+            print("\n")
+        print("----------------------------------------------")
 
         return excel_list
 

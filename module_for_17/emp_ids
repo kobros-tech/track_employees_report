@@ -1,0 +1,331 @@
+
+========================================================= NOT NEEDED RECORDS =========================================================
+
+hr.employee(775,) res.users()		====> has no user id
+
+hr.employee(777,) res.users(359,)	===> is repeated with hr.employee(8,)
+
+hr.employee(786,) res.users()		====> has no user id
+
+
+
+========================================================= All EMPLOYEES RELATED WITH MORE THAN ONE PROJECT =========================================================
+
+15
+
+hr.employee(15,) project.project(32, 31)
+hr.employee(3,) project.project(21, 16, 13)
+hr.employee(50,) project.project(23, 18)
+hr.employee(778,) project.project(11, 19)
+hr.employee(6,) project.project(47, 31)
+hr.employee(74,) project.project(14, 23)
+hr.employee(23,) project.project(16, 13)
+hr.employee(89,) project.project(32, 9)
+hr.employee(92,) project.project(29, 28)
+hr.employee(1,) project.project(6, 5, 4, 3, 2)
+hr.employee(9,) project.project(16, 13)
+hr.employee(29,) project.project(25, 15)
+hr.employee(113,) project.project(11, 19)
+hr.employee(12,) project.project(11, 19)
+hr.employee(124,) project.project(32, 9)
+
+
+========================================================= All EMPLOYEES WITH THEIR USER ID =========================================================
+
+139
+
+hr.employee(46,) res.users(176,)		176
+hr.employee(14,) res.users(293,)		293
+hr.employee(15,) res.users(294,)		294
+hr.employee(2,) res.users(353,)			353
+hr.employee(16,) res.users(295,)		295
+hr.employee(47,) res.users(296,)		296
+hr.employee(790,) res.users(399,)		399
+hr.employee(17,) res.users(297,)		297
+hr.employee(48,) res.users(177,)		177
+hr.employee(49,) res.users(178,)		178
+hr.employee(3,) res.users(354,)			354
+hr.employee(50,) res.users(179,)		179
+hr.employee(4,) res.users(355,)			355
+hr.employee(18,) res.users(298,)		298
+hr.employee(45,) res.users(180,)		180
+hr.employee(51,) res.users(181,)		181
+hr.employee(53,) res.users(183,)		183
+hr.employee(54,) res.users(184,)		184
+hr.employee(5,) res.users(356,)			356
+hr.employee(55,) res.users(185,)		185
+hr.employee(56,) res.users(186,)		186
+hr.employee(57,) res.users(187,)		187
+hr.employee(58,) res.users(188,)		188
+hr.employee(59,) res.users(189,)		189
+hr.employee(20,) res.users(300,)		300
+hr.employee(19,) res.users(299,)		299
+hr.employee(784,) res.users(387,)		387
+hr.employee(775,) res.users()
+hr.employee(60,) res.users(190,)		190
+hr.employee(778,) res.users(367,)		367
+hr.employee(63,) res.users(193,)		193
+hr.employee(62,) res.users(192,)		192
+hr.employee(64,) res.users(194,)		194
+hr.employee(65,) res.users(195,)		195
+hr.employee(66,) res.users(196,)		196
+hr.employee(67,) res.users(197,)		197
+hr.employee(785,) res.users(388,)		388
+hr.employee(68,) res.users(198,)		198
+hr.employee(69,) res.users(199,)		199
+hr.employee(70,) res.users(200,)		200
+hr.employee(21,) res.users(301,)		301
+hr.employee(71,) res.users(201,)		201
+hr.employee(776,) res.users(366,)		366
+hr.employee(72,) res.users(202,)		202
+hr.employee(6,) res.users(357,)			357
+hr.employee(73,) res.users(203,)		203
+hr.employee(787,) res.users(391,)		391
+hr.employee(74,) res.users(204,)		204
+hr.employee(76,) res.users(206,)		206
+hr.employee(7,) res.users(358,)			358
+hr.employee(77,) res.users(207,)		207
+hr.employee(8,) res.users(359,)			359
+hr.employee(777,) res.users(359,)
+hr.employee(78,) res.users(208,)		208
+hr.employee(79,) res.users(209,)		209
+hr.employee(80,) res.users(210,)		210
+hr.employee(81,) res.users(211,)		211
+hr.employee(781,) res.users(369,)		369
+hr.employee(82,) res.users(212,)		212
+hr.employee(83,) res.users(213,)		213
+hr.employee(84,) res.users(214,)		214
+hr.employee(22,) res.users(302,)		302
+hr.employee(23,) res.users(303,)		303
+hr.employee(24,) res.users(304,)		304
+hr.employee(85,) res.users(215,)		215
+hr.employee(86,) res.users(216,)		216
+hr.employee(87,) res.users(217,)		217
+hr.employee(88,) res.users(218,)		218
+hr.employee(25,) res.users(305,)		305
+hr.employee(89,) res.users(219,)		219
+hr.employee(90,) res.users(220,)		220
+hr.employee(92,) res.users(222,)		222
+hr.employee(93,) res.users(223,)		223
+hr.employee(94,) res.users(224,)		224
+hr.employee(26,) res.users(306,)		306
+hr.employee(95,) res.users(225,)		225
+hr.employee(97,) res.users(227,)		227
+hr.employee(98,) res.users(228,)		228
+hr.employee(27,) res.users(307,)		307
+hr.employee(99,) res.users(229,)		229
+hr.employee(100,) res.users(230,)		230
+hr.employee(28,) res.users(308,)		308
+hr.employee(101,) res.users(231,)		231
+hr.employee(102,) res.users(232,)		232
+hr.employee(103,) res.users(233,)		233
+hr.employee(104,) res.users(234,)		234
+hr.employee(1,) res.users(2,)			2
+hr.employee(105,) res.users(235,)		235
+hr.employee(9,) res.users(360,)			360
+hr.employee(10,) res.users(361,)		361
+hr.employee(29,) res.users(309,)		309
+hr.employee(106,) res.users(236,)		236
+hr.employee(107,) res.users(237,)		237
+hr.employee(30,) res.users(310,)		310
+hr.employee(108,) res.users(238,)		238
+hr.employee(109,) res.users(239,)		239
+hr.employee(783,) res.users(386,)		386
+hr.employee(110,) res.users(240,)		240
+hr.employee(31,) res.users(311,)		311
+hr.employee(782,) res.users(370,)		370
+hr.employee(111,) res.users(241,)		241
+hr.employee(32,) res.users(312,)		312
+hr.employee(112,) res.users(242,)		242
+hr.employee(33,) res.users(313,)		313
+hr.employee(788,) res.users(392,)		392
+hr.employee(113,) res.users(243,)		243
+hr.employee(114,) res.users(244,)		244
+hr.employee(115,) res.users(245,)		245
+hr.employee(34,) res.users(314,)		314
+hr.employee(116,) res.users(246,)		246
+hr.employee(35,) res.users(315,)		315
+hr.employee(11,) res.users(362,)		362
+hr.employee(36,) res.users(316,)		316
+hr.employee(117,) res.users(247,)		247
+hr.employee(37,) res.users(317,)		317
+hr.employee(38,) res.users(318,)		318
+hr.employee(118,) res.users(248,)		248
+hr.employee(119,) res.users(249,)		249
+hr.employee(39,) res.users(319,)		319
+hr.employee(786,) res.users()
+hr.employee(12,) res.users(363,)		363
+hr.employee(120,) res.users(250,)		250
+hr.employee(40,) res.users(320,)		320
+hr.employee(121,) res.users(251,)		251
+hr.employee(122,) res.users(252,)		252
+hr.employee(41,) res.users(321,)		321
+hr.employee(42,) res.users(322,)		322
+hr.employee(779,) res.users(253,)		253	
+hr.employee(123,) res.users(364,)		364
+hr.employee(124,) res.users(254,)		254
+hr.employee(789,) res.users(393,)		393
+hr.employee(43,) res.users(323,)		323
+hr.employee(126,) res.users(256,)		256
+hr.employee(44,) res.users(324,)		324
+hr.employee(127,) res.users(257,)		257
+hr.employee(129,) res.users(260,)		260
+hr.employee(13,) res.users(365,)		365
+hr.employee(128,) res.users(258,)		258
+hr.employee(780,) res.users(368,)		368
+
+
+
+========================================================= ONLY ASSIGNED EMPLOYEES =========================================================
+
+107
+
+hr.employee(46,)
+hr.employee(14,)
+hr.employee(15,)
+hr.employee(2,)
+hr.employee(16,)
+hr.employee(47,)
+hr.employee(17,)
+hr.employee(48,)
+hr.employee(3,)
+hr.employee(50,)
+hr.employee(4,)
+hr.employee(18,)
+hr.employee(54,)
+hr.employee(5,)
+hr.employee(55,)
+hr.employee(56,)
+hr.employee(57,)
+hr.employee(59,)
+hr.employee(20,)
+hr.employee(19,)
+hr.employee(784,)
+hr.employee(60,)
+hr.employee(778,)
+hr.employee(63,)
+hr.employee(62,)
+hr.employee(65,)
+hr.employee(66,)
+hr.employee(67,)
+hr.employee(68,)
+hr.employee(69,)
+hr.employee(70,)
+hr.employee(21,)
+hr.employee(72,)
+hr.employee(6,)
+hr.employee(73,)
+hr.employee(787,)
+hr.employee(74,)
+hr.employee(76,)
+hr.employee(7,)
+hr.employee(77,)
+hr.employee(8,)
+hr.employee(777,)
+hr.employee(79,)
+hr.employee(80,)
+hr.employee(781,)
+hr.employee(82,)
+hr.employee(83,)
+hr.employee(22,)
+hr.employee(23,)
+hr.employee(24,)
+hr.employee(85,)
+hr.employee(86,)
+hr.employee(87,)
+hr.employee(88,)
+hr.employee(25,)
+hr.employee(89,)
+hr.employee(90,)
+hr.employee(92,)
+hr.employee(93,)
+hr.employee(26,)
+hr.employee(95,)
+hr.employee(97,)
+hr.employee(27,)
+hr.employee(99,)
+hr.employee(102,)
+hr.employee(103,)
+hr.employee(104,)
+hr.employee(1,)
+hr.employee(105,)
+hr.employee(9,)
+hr.employee(10,)
+hr.employee(29,)
+hr.employee(106,)
+hr.employee(30,)
+hr.employee(108,)
+hr.employee(109,)
+hr.employee(110,)
+hr.employee(31,)
+hr.employee(782,)
+hr.employee(32,)
+hr.employee(112,)
+hr.employee(33,)
+hr.employee(788,)
+hr.employee(113,)
+hr.employee(114,)
+hr.employee(115,)
+hr.employee(34,)
+hr.employee(116,)
+hr.employee(35,)
+hr.employee(11,)
+hr.employee(36,)
+hr.employee(117,)
+hr.employee(37,)
+hr.employee(39,)
+hr.employee(12,)
+hr.employee(120,)
+hr.employee(122,)
+hr.employee(41,)
+hr.employee(42,)
+hr.employee(123,)
+hr.employee(124,)
+hr.employee(43,)
+hr.employee(126,)
+hr.employee(44,)
+hr.employee(127,)
+hr.employee(13,)
+hr.employee(128,)
+
+
+========================================================= NOT ASSIGNED EMPLOYEES =========================================================
+
+32
+
+
+hr.employee(790,)
+hr.employee(49,)
+hr.employee(45,)
+hr.employee(51,)
+hr.employee(53,)
+hr.employee(58,)
+hr.employee(775,)
+hr.employee(64,)
+hr.employee(785,)
+hr.employee(71,)
+hr.employee(776,)
+hr.employee(78,)
+hr.employee(81,)
+hr.employee(84,)
+hr.employee(94,)
+hr.employee(98,)
+hr.employee(100,)
+hr.employee(28,)
+hr.employee(101,)
+hr.employee(107,)
+hr.employee(783,)
+hr.employee(111,)
+hr.employee(38,)
+hr.employee(118,)
+hr.employee(119,)
+hr.employee(786,)
+hr.employee(40,)
+hr.employee(121,)
+hr.employee(779,)
+hr.employee(789,)
+hr.employee(129,)
+hr.employee(780,)
+
+
+
