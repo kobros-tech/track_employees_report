@@ -32,7 +32,7 @@
                     </tree>
                 </field>
                 
-                <notebook>
+                <!-- <notebook>
                     <page>
                         <field name="target_employees_ids" readonly="1">
                             <tree>
@@ -41,7 +41,7 @@
                             </tree>
                         </field>
                     </page>
-                </notebook>
+                </notebook> -->
 
                 <footer>
                     <!-- <button name="" type="object"

@@ -56,8 +56,8 @@ class PrintExcel extends Component {
             to_date: to_date,
             validate: validate,
         };
-        console.log(this.props.record.data.project_ids.records)
-        console.log(data, projects_ids)
+        // console.log(this.props.record.data.project_ids.records)
+        // console.log(data, projects_ids)
         download({
             url: '/employee_xlsx_report',
             data: { data: JSON.stringify(data) },

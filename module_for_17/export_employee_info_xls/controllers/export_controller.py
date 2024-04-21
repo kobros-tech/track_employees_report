@@ -304,10 +304,10 @@ class XLSXReportController(http.Controller):
 
         excel_list = []
 
-        print("==================================")
-        print(employees)
-        print(projects)
-        print("==================================")
+        # print("==================================")
+        # print(employees)
+        # print(projects)
+        # print("==================================")
         
         for employee in employees:
             # print("employee record:", employee)
@@ -343,7 +343,7 @@ class XLSXReportController(http.Controller):
                     }
                 )
             
-        print(projects)
+        # print(projects)
         # print("----------------------------------------------")
         # print("Excel List:")
         # for item in excel_list:
@@ -359,6 +359,12 @@ class XLSXReportController(http.Controller):
     
 
     def get_xlsx_report(self, data):
+        
+        # print("=============== data ===============")
+        # print(data)
+        # for row in data:
+        #     print(row['employee'], row['employee'].name, row['employee'].active)
+        # print("=============== data ===============")
 
         if len(data) == 0:
             raise ValidationError("Did not find any matching employees")
@@ -484,9 +490,9 @@ class XLSXReportController(http.Controller):
         data = json.loads(data)
         
         excel_list = self.prepare_excel_list(data)
-        print("============= Excel List =============")
-        print(data)
-        print("============= Excel List =============")
+        # print("============= Excel List =============")
+        # print(data)
+        # print("============= Excel List =============")
         
         filename = "employee_timesheet_report"
         xlsx_data = self.get_xlsx_report(excel_list)
