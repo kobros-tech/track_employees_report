@@ -279,6 +279,7 @@ class XLSXReportController(http.Controller):
         employees_list = data['hr.employee']
         employees_list_2 = data['employee']
         projects_list = data['project.project']
+        po = data['po']
 
         number_of_days = (to_date - from_date).days + 1
 
@@ -297,8 +298,18 @@ class XLSXReportController(http.Controller):
 
                 item_tasks = item_project.task_ids
                 item_assignees = item_tasks.mapped("user_ids")
-                item_employees = request.env['hr.employee'].search(["&", ('active', '=', True), ("user_id", "in", item_assignees.mapped("id"))])
+                item_employees = request.env['hr.employee'].search(
+                    ["&", ('active', '=', True), ("user_id", "in", item_assignees.mapped("id"))]
+                )
                 employees |= item_employees
+        elif len(po) > 0:
+            po_projects = request.env['project.project'].search([("po", "ilike", po)])
+            po_tasks = po_projects.task_ids
+            po_assignees = po_tasks.mapped("user_ids")
+            po_employees = request.env['hr.employee'].search(
+                ["&", ('active', '=', True), ("user_id", "in", po_assignees.mapped("id"))]
+            )
+            employees |= po_employees
         else:
             employees = request.env['hr.employee'].search([('active', '=', True)])
 
@@ -326,8 +337,12 @@ class XLSXReportController(http.Controller):
                     projects |= request.env['project.project'].browse([
                         item['id']
                     ])
+            
+            if len(po) > 0:
+                po_projects = request.env['project.project'].search([("po", "ilike", po)])
+                projects |= po_projects
                 
-                # print("Projects:", projects.mapped("display_name"))
+            # print("Projects:", projects.mapped("display_name"))
 
             
             for project in projects:
@@ -490,9 +505,9 @@ class XLSXReportController(http.Controller):
         data = json.loads(data)
         
         excel_list = self.prepare_excel_list(data)
-        # print("============= Excel List =============")
-        # print(data)
-        # print("============= Excel List =============")
+        print("============= Data =============")
+        print(data)
+        print("============= Data =============")
         
         filename = "employee_timesheet_report"
         xlsx_data = self.get_xlsx_report(excel_list)

@@ -15,8 +15,9 @@ class PrintExcel extends Component {
     get showButton() {
         if (this.props.record.data.validate && 
             this.props.record.data.from_date && 
-            this.props.record.data.to_date && 
-            this.props.record.data.target_employees_ids.records.length > 0) {
+            this.props.record.data.to_date 
+            // && this.props.record.data.target_employees_ids.records.length > 0
+        ) {
             return false
         }
         else {
@@ -33,6 +34,7 @@ class PrintExcel extends Component {
         const from_date = this.props.record.data.from_date.c
         const to_date = this.props.record.data.to_date.c
         const validate = this.props.record.data.validate
+        const po = this.props.record.data.po
         
         const projects_ids = projects.map((project) =>{
             let name = project.data.display_name;
@@ -47,7 +49,7 @@ class PrintExcel extends Component {
         const target_employees_ids = employees.map((employee) =>{
             return employee.data;
         })
-
+        
         const data = { 
             "project.project": projects_ids, 
             "hr.employee": target_employees_ids,
@@ -55,9 +57,10 @@ class PrintExcel extends Component {
             from_date: from_date,
             to_date: to_date,
             validate: validate,
+            po: po,
         };
         // console.log(this.props.record.data.project_ids.records)
-        // console.log(data, projects_ids)
+        console.log(data, po)
         download({
             url: '/employee_xlsx_report',
             data: { data: JSON.stringify(data) },
